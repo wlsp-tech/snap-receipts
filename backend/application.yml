@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+  security:
+    user:
+      name: disabled
+      password: disabled
