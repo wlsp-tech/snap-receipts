@@ -1,3 +1,3 @@
 package wlsp.tech.backend.model.dto;
 
-public record RegisterRequest(String email, String password) {}
+public record RegisterRequest(String nameOfUser, String email, String password) {}

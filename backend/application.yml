@@ -10,3 +10,7 @@ spring:
     user:
       name: disabled
       password: disabled
+
+logging:
+  level:
+    org.springframework.security: DEBUG
