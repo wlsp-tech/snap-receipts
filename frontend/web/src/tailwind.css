@@ -161,3 +161,10 @@
         margin: 0 auto;
     }
 }
+
+@layer utilities {
+    .duration-opacity-700 {
+        transition-property: opacity;
+        transition-duration: 700ms;
+    }
+}

@@ -7,16 +7,19 @@ import {Button} from "@/components/ui/button.tsx"
 import {FormField, FormItem, FormMessage} from "@/components/ui/form.tsx"
 import {cn} from "@/lib/utils.ts"
 import {ComponentProps} from "react"
-import {fetchCurrentUser, loginUser} from "@/features/auth";
 import {toast} from "sonner";
 import {Loader2} from "lucide-react";
+import {useNavigate} from "@tanstack/react-router";
+import {useAuth} from "@/features/auth/hooks";
 
 const loginSchema = z.object({
     email: z.string().email({message: "Please enter a valid e-mail."}),
-    password: z.string().min(4, {message: "Password cannot be empty."}),
+    password: z.string().min(4, {message: "Password cannot be this short budy."}),
 })
 
 export function LoginForm({className, ...props}: ComponentProps<"form">) {
+    const { login } = useAuth();
+    const navigate = useNavigate()
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -25,35 +28,31 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
         },
     })
 
-    const { reset, formState: { isSubmitting} } = form
+    const { reset, formState: { isSubmitting, errors } } = form
 
-    const onSubmit = async (data: z.infer<typeof loginSchema>)=> {
+    const onSubmit = async (values: z.infer<typeof loginSchema>) => {
         try {
-            const result = await loginUser(data);
-            if(result.success) {
-                toast.success(`Welcome ${result.data.nameOfUser}!`);
-                reset();
-
-                const currentUser = await fetchCurrentUser();
-                console.log("Current user:", currentUser);
-            }
-            console.log(result)
+            await login(values.email, values.password)
+            await navigate({ to: '/dashboard' })
+            reset()
         } catch (err) {
             if (err instanceof Error) {
-                console.log((err))
-                toast.error(`Login failed: ${err.message}`);
+                form.setError("root", { message: "Try again budy..." })
+                toast.error(`Login failed!`);
             } else {
-                toast.error("Unknown error while login");
+                toast.error("Unknown error during login.");
             }
         }
-
     }
 
     return (
         <FormProvider {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className={cn("flex flex-col gap-6", className)}
+                className={cn("flex flex-col gap-6 p-2 border border-transparent rounded-xl",
+                    className,
+                    errors.root && "border border-destructive"
+                )}
                 {...props}
             >
                 <FormField
@@ -99,6 +98,9 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
+                {errors.root && (
+                    <div className="text-destructive">{errors.root.message}</div>
+                )}
             </form>
         </FormProvider>
     )

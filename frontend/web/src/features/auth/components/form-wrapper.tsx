@@ -10,12 +10,12 @@ export function FormWrapper({
     headerLabel,
     showSocial = false,
     className
-}: FormWrapperProps) {
+}: Readonly<FormWrapperProps>) {
     return (
         <div className="max-w-5xl mx-auto flex flex-col gap-6 flex-1">
-            <Card className={cn("overflow-hidden p-0", className
+            <Card className={cn("overflow-hidden p-0 h-full", className
             )}>
-                <CardContent className="grid p-0 md:grid-cols-2 w-full">
+                <CardContent className="grid p-0 md:grid-cols-2 w-full h-full">
                     <div className="p-6 md:p-8 flex flex-col justify-center gap-6">
                         <CardHeader>
                             <h1 className="text-2xl font-bold text-center">{headerLabel}</h1>
@@ -31,7 +31,6 @@ export function FormWrapper({
                         </div>
 
                         {showSocial && (
-                            <>
                                 <div className="grid grid-cols-3 gap-4">
                                     <Button variant="outline" type="button" className="w-full">
                                         {/* Icon Apple */}
@@ -73,14 +72,13 @@ export function FormWrapper({
                                         <span className="sr-only">Login with Meta</span>
                                     </Button>
                                 </div>
-                            </>
                         )}
                     </div>
 
                     <div className="bg-muted relative hidden md:block">
                         <img
                             src="/placeholder.svg"
-                            alt="Image"
+                            alt="Placeholder"
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                         />
                     </div>
@@ -88,15 +86,11 @@ export function FormWrapper({
             </Card>
             <div
                 className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-                By clicking continue, you agree to our{" "}
-                <a href="#" className="underline">
-                    Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="underline">
-                    Privacy Policy
-                </a>
-                .
+                <p>
+                    By clicking continue, you agree to our <span className="underline">Terms of Service</span>
+                    {" "} and {" "}
+                    <span className="underline">Privacy Policy</span>.
+                </p>
             </div>
         </div>
     )

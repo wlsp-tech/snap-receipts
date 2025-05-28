@@ -1,21 +1,15 @@
-import {HomeIcon} from "lucide-react";
+import { HomeIcon, LayoutDashboardIcon} from "lucide-react";
 
 export const navItems = [
     {
-        link: "Dashboard",
+        link: "",
         path: "/",
-        icon: HomeIcon
+        icon: HomeIcon,
+        public: true
+    },{
+        link: "Dashboard",
+        path: "/dashboard",
+        icon: LayoutDashboardIcon,
+        public: false
     },
-    /*
-    {
-        link: "Log-In",
-        path: "/login",
-        icon: LucideLogIn
-    },
-
-    {
-        link: "Register",
-        path: "/register",
-        icon: ForwardIcon
-    },*/
 ]
