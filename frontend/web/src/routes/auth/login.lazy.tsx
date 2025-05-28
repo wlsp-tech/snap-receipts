@@ -13,7 +13,7 @@ function RouteComponent() {
             <FormWrapper
                 mode={"login"}
                 className="flex flex-1 items-center"
-                headerLabel={'Welcome Back!'}
+                headerLabel={'Welcome Back - to the Snap side of the Receipts!'}
             >
                 <LoginForm/>
             </FormWrapper>

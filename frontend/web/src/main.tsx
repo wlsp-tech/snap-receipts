@@ -1,28 +1,45 @@
-import { StrictMode } from 'react'
+import {StrictMode} from 'react'
 import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import {createRouter} from '@tanstack/react-router'
 import './index.css'
+import {routeTree} from './routeTree.gen'
+import {QueryClientProvider} from "@tanstack/react-query";
+import {queryClient} from "@/lib/queryClient.ts";
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+import {Toaster} from "sonner";
+import {useAuth} from "@/features/auth/hooks";
+import {AuthProvider} from "@/providers/auth-provider.tsx";
+import {RouterWithContext} from "@/router-with-context.tsx";
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+export const router = createRouter({
+    routeTree,
+    defaultPreload: 'intent',
+    context: {
+        auth: undefined!, // placeholder
+    },
+})
 
-// Create a new router instance
-const router = createRouter({ routeTree })
-
-// Register the router instance for type safety
 declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
+    interface Register {
+        router: typeof router
+        context: {
+            auth: ReturnType<typeof useAuth>
+        }
+    }
 }
 
-// Render the app
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(
-      <StrictMode>
-        <RouterProvider router={router} />
-      </StrictMode>,
-  )
+    const root = ReactDOM.createRoot(rootElement)
+    root.render(
+        <StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                    <RouterWithContext />
+                    <ReactQueryDevtools initialIsOpen={false}/>
+                    <Toaster position={"bottom-center"} richColors/>
+                </AuthProvider>
+            </QueryClientProvider>
+        </StrictMode>,
+    )
 }

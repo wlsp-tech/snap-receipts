@@ -1,6 +1,5 @@
-import {Toaster} from "sonner";
-import {Outlet} from "@tanstack/react-router";
 import {TanStackRouterDevtools} from "@tanstack/react-router-devtools";
+import {Outlet} from "@tanstack/react-router";
 import {ThemeProvider} from "@/providers/theme-provider.tsx";
 import {Footer, Header} from "@/components/layout";
 
@@ -12,7 +11,6 @@ const RootLayout = () => {
                 <Outlet/>
             </main>
             <Footer />
-            <Toaster richColors/>
             <TanStackRouterDevtools/>
         </ThemeProvider>
     )

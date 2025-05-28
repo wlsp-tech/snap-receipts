@@ -14,7 +14,7 @@ import wlsp.tech.backend.service.IdService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
