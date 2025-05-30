@@ -14,7 +14,7 @@ import wlsp.tech.backend.service.IdService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -77,7 +77,7 @@ public class AuthController {
     return ResponseEntity.ok(new ApiResponse<>(true, new UserDto(user.nameOfUser(), user.email()), null));
   }
 
-  @PostMapping("/logout")
+  @GetMapping("/logout")
   public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
     session.invalidate();
     return ResponseEntity.ok(new ApiResponse<>(true, null, null));
