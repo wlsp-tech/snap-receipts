@@ -25,16 +25,10 @@ export async function fetchCurrentUser() {
     }
 }
 
+
 export async function logoutUser() {
     try {
-        const response = await api.post(`${AUTH_BASE}/logout`, {}, {
-            withCredentials: true
-        });
-
-        document.cookie.split(';').forEach(c => {
-            document.cookie = c.trim().split('=')[0] + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
-        });
-
+        const response = await api.get(`${AUTH_BASE}/logout`);
         return response.data;
     } catch (error) {
         console.error('Logout failed:', error);

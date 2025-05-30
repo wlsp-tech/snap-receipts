@@ -66,3 +66,9 @@ export type UserAvatarActionsProps = {
     onLogout?: () => void;
     btnClassName?: string;
 }
+
+export interface ReceiptProps {
+    id: string;
+    uuid: string;
+    base64Image: string
+}
