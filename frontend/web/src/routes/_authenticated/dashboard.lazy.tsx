@@ -29,7 +29,7 @@ const Dashboard = () => {
           <QRCodeComp uuid={uuid} />
           {receipts.map((receipt) => (
               <div key={receipt.id}>
-                  <p>{receipt.uuid}</p>
+                  <p>Image UUID: {receipt.uuid}</p>
               </div>
           ))}
       </LayoutContainer>

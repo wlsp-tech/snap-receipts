@@ -25,7 +25,6 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     const login = async (email: string, password: string) => {
         const res = await loginUser({ email, password })
         if (res.success) {
-            console.log(res.data)
             setUser(res.data)
             toast.success(`Welcome back, ${res.data.nameOfUser}`)
         } else {
