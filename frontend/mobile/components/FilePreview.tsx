@@ -1,5 +1,6 @@
 import React from "react";
-import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
+import {Image} from "expo-image";
 
 type Props = {
     uri: string | null;
@@ -27,7 +28,12 @@ export default function FilePreview({ uri }: Readonly<Props>) {
 
     return (
         <View style={styles.imageContainer}>
-            <Image source={{ uri }} style={styles.image} />
+            <Image
+                style={styles.image}
+                source={{ uri }}
+                contentFit="cover"
+                transition={1000}
+            />
         </View>
     );
 }
@@ -36,7 +42,7 @@ const styles = StyleSheet.create({
     imageContainer: {
         flex: 1,
         width: "100%",
-        height: "auto",
+        height: "100%",
         borderRadius: 8,
         overflow: "hidden",
         backgroundColor: "#f0f0f0",
@@ -46,6 +52,5 @@ const styles = StyleSheet.create({
     image: {
         width: "100%",
         height: "100%",
-        resizeMode: "cover",
     },
 });

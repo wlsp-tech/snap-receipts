@@ -24,7 +24,6 @@ const Header = () => {
 
         return () => clearTimeout(timeout)
     }, [])
-    const normalizedUser = user?.data ?? user
 
     return (
         <header
@@ -48,7 +47,7 @@ const Header = () => {
                     ) : (
                         <UserAvatarAction
                             btnClassName={cn("opacity-0", mounted && "opacity-100 duration-opacity-700")}
-                            nameOfUser={normalizedUser?.nameOfUser}
+                            nameOfUser={user?.nameOfUser}
                             onLogout={handleLogOut}
                         />
                     )}

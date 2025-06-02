@@ -45,8 +45,9 @@ export interface LoginPayload {
 }
 
 export interface UserDto {
-    nameOfUser: string,
-    email: string
+    nameOfUser: string;
+    email: string;
+    receiptIds: string[];
 }
 
 export type NavigationProps = {
@@ -70,5 +71,6 @@ export type UserAvatarActionsProps = {
 export interface ReceiptProps {
     id: string;
     uuid: string;
-    base64Image: string
+    imageUri: string;
+    createdAt: string
 }

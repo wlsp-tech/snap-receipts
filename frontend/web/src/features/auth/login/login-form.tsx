@@ -17,7 +17,7 @@ const loginSchema = z.object({
     password: z.string().min(4, {message: "Password cannot be this short budy."}),
 })
 
-export function LoginForm({className, ...props}: ComponentProps<"form">) {
+export function LoginForm({...props}: ComponentProps<"form">) {
     const { login } = useAuth();
     const navigate = useNavigate()
     const form = useForm<z.infer<typeof loginSchema>>({
@@ -38,7 +38,7 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
         } catch (err) {
             if (err instanceof Error) {
                 form.setError("root", { message: "Try again budy..." })
-                toast.error(`Login failed!`);
+                toast.error("Login failed!");
             } else {
                 toast.error("Unknown error during login.");
             }
@@ -49,10 +49,7 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
         <FormProvider {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className={cn("flex flex-col gap-6 p-2 border border-transparent rounded-xl",
-                    className,
-                    errors.root && "border border-destructive"
-                )}
+                className="flex flex-col gap-6 p-2 border border-transparent rounded-xl relative"
                 {...props}
             >
                 <FormField
@@ -67,6 +64,7 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
                                 placeholder="j@example.com"
                                 type="email"
                                 disabled={isSubmitting}
+                                className={cn(errors.root && "border border-destructive")}
                             />
                             <FormMessage/>
                         </FormItem>
@@ -84,6 +82,7 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
                                 id="password"
                                 type="password"
                                 disabled={isSubmitting}
+                                className={cn(errors.root && "border border-destructive")}
                             />
                             <FormMessage/>
                         </FormItem>
@@ -99,7 +98,9 @@ export function LoginForm({className, ...props}: ComponentProps<"form">) {
                     {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
                 {errors.root && (
-                    <div className="text-destructive">{errors.root.message}</div>
+                    <div className="text-destructive absolute -bottom-5">
+                        <small>{errors.root.message}</small>
+                    </div>
                 )}
             </form>
         </FormProvider>

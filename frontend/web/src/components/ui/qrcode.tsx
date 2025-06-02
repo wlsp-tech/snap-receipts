@@ -1,7 +1,7 @@
 import {QRCodeSVG} from 'qrcode.react';
 
-const  QRCodeComp = ({ uuid } : {uuid: string}) => {
-    const url = `http://192.168.178.116:8081/document-upload/receipt/${uuid}`;
+const  QRCodeComp = ({ token } : {token?: string}) => {
+    const url = `http://192.168.178.116:8081/document-upload/receipt/${token}`;
     return (
         <div>
             <QRCodeSVG value={url} size={100} />

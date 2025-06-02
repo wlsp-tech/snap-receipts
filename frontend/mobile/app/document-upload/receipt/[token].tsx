@@ -3,16 +3,11 @@ import {View, Text, StyleSheet} from "react-native";
 import UploadDocument from "@/components/UploadDocument";
 
 export default function ReceiptScreen() {
-    const { uuid } = useLocalSearchParams();
-
-    const handleTakePhoto = () => {
-        console.log("Opens camera: ", uuid)
-    }
-
+    const { token } = useLocalSearchParams();
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Document Upload</Text>
-            <UploadDocument />
+            <UploadDocument token={token}/>
         </View>
     );
 }

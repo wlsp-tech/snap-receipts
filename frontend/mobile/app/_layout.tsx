@@ -23,7 +23,7 @@ export default function RootLayout() {
                         headerLeft: () => null,
                     }}
                 />
-                <Stack.Screen name="document-upload/receipt/[uuid]" options={{ headerShown: false}} />
+                <Stack.Screen name="document-upload/receipt/[token]" options={{ headerShown: false}} />
                 <Stack.Screen name="+not-found" options={{headerTitle: "Nothing here! What you searching for?"}}/>
             </Stack>
             <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'}/>

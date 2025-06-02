@@ -1,13 +1,17 @@
 import React, {useRef, useState} from "react";
-import {Modal, Pressable, StyleSheet, Text, View} from "react-native";
+import {ActivityIndicator, Modal, Platform, Pressable, StyleSheet, Text, View} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import {BlurView} from 'expo-blur';
 
 type Props = {
     onSelect: (uri: string, base64?: string) => void;
+    readyToUploadFile: boolean;
+    setReadyToUploadFile: (state: boolean) => void;
+    loading: boolean;
+    handleUploadCallback: () => void;
 };
 
-export default function PhotoSelector({onSelect}: Readonly<Props>) {
+export default function PhotoSelector({onSelect, readyToUploadFile, setReadyToUploadFile, loading, handleUploadCallback}: Readonly<Props>) {
     const [modalVisible, setModalVisible] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,9 +27,11 @@ export default function PhotoSelector({onSelect}: Readonly<Props>) {
             base64: true,
             mediaTypes: "images",
         });
+        setReadyToUploadFile(true)
 
         if (!result.canceled) {
             const {uri, base64} = result.assets[0];
+            setReadyToUploadFile(true)
             setModalVisible(false);
             onSelect(uri, base64 ?? undefined);
         }
@@ -50,6 +56,7 @@ export default function PhotoSelector({onSelect}: Readonly<Props>) {
         };
         reader.readAsDataURL(file);
         setModalVisible(false);
+        setReadyToUploadFile(true)
     };
 
     return (
@@ -74,18 +81,32 @@ export default function PhotoSelector({onSelect}: Readonly<Props>) {
                 </BlurView>
             </Modal>
 
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*,application/pdf"
-                style={{display: "none"}}
-                onChange={onFileChange}
-            />
+            {Platform.OS === "web" && (
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    style={{display: "none"}}
+                    onChange={onFileChange}
+                />
+            )}
 
             <View style={styles.btnContainer}>
-                <Pressable style={[styles.button, styles.wideBtn]} onPress={() => setModalVisible(true)}>
-                    <Text style={styles.text}>Scan Document</Text>
-                </Pressable>
+                {!readyToUploadFile && (
+                    <Pressable style={[styles.button, styles.wideBtn]} onPress={() => setModalVisible(true)}>
+                        <Text style={styles.text}>Scan Document</Text>
+                    </Pressable>
+                )}
+                {readyToUploadFile
+                    && (
+                        <Pressable style={[styles.button, styles.wideBtn]} onPress={() => handleUploadCallback()}>
+                        <Text style={styles.text}>
+                            {loading &&
+                                <ActivityIndicator size="small" color="green" />
+                            } Upload Document
+                        </Text>
+                        </Pressable>
+                    )}
             </View>
         </View>
     );
