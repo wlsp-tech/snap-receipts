@@ -1,4 +1,6 @@
 package wlsp.tech.backend.model.dto;
 
-public record UserDto(String nameOfUser, String email) {
+import java.util.List;
+
+public record UserDto(String nameOfUser, String email, List<String> receiptIds) {
 }

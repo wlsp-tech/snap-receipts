@@ -7,25 +7,38 @@ import {Button} from "@/components/ui/button"
 import {FormField, FormItem, FormMessage} from "@/components/ui/form"
 import {cn} from "@/lib/utils"
 import {ComponentProps} from "react"
+import {signUpUser} from "@/features/auth/service/auth-service.ts";
+import {toast} from "sonner";
+import {useNavigate} from "@tanstack/react-router";
 
 const signUpSchema = z.object({
-    name: z.string().min(1, {message: "Name cannot be empty"}),
+    nameOfUser: z.string().min(1, {message: "Name cannot be empty"}),
     email: z.string().email({message: "Please provide a valid e-mail."}),
     password: z.string().min(6, {message: "Your password is not strong enough - Try again!"}),
 })
 
 export function SignUpForm({className, ...props}: ComponentProps<"form">) {
+    const navigate = useNavigate();
     const form = useForm<z.infer<typeof signUpSchema>>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
-            name: "",
+            nameOfUser: "",
             email: "",
             password: "",
         },
     })
 
-    function onSubmit(data: z.infer<typeof signUpSchema>) {
-        console.log("Register data:", data)
+    async function onSubmit(data: z.infer<typeof signUpSchema>) {
+        try {
+            await signUpUser(data);
+            toast.success("Welcome, to the bright side of the receipts!")
+            form.reset();
+            await navigate({ to: '/auth/login' })
+        } catch (e) {
+            if(e instanceof Error) {
+                toast.error(`Could not sign-up user! Error: ${e.message}`)
+            }
+        }
     }
 
     return (
@@ -37,11 +50,11 @@ export function SignUpForm({className, ...props}: ComponentProps<"form">) {
             >
                 <FormField
                     control={form.control}
-                    name="name"
+                    name="nameOfUser"
                     render={({field}) => (
                         <FormItem>
                             <Label htmlFor="name">Name</Label>
-                            <Input {...field} id="name" placeholder="Jane Doe"/>
+                            <Input {...field} id="nameOfUser" placeholder="Jane Doe"/>
                             <FormMessage/>
                         </FormItem>
                     )}

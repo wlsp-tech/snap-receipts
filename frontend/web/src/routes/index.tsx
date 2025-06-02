@@ -4,7 +4,7 @@ import LayoutContainer from "@/components/shared/layout-container.tsx";
 const Root = () => {
     return (
         <LayoutContainer>
-            <h3>Welcome Home!</h3>
+            <h3>Welcome to the Snap side of the Receipts!</h3>
         </LayoutContainer>
     )
 }

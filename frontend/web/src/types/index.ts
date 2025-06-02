@@ -45,8 +45,9 @@ export interface LoginPayload {
 }
 
 export interface UserDto {
-    nameOfUser: string,
-    email: string
+    nameOfUser: string;
+    email: string;
+    receiptIds: string[];
 }
 
 export type NavigationProps = {
@@ -65,4 +66,11 @@ export type UserAvatarActionsProps = {
     className?: string;
     onLogout?: () => void;
     btnClassName?: string;
+}
+
+export interface ReceiptProps {
+    id: string;
+    uuid: string;
+    imageUri: string;
+    createdAt: string
 }

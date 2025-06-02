@@ -12,6 +12,11 @@ const Header = () => {
     const navigate = useNavigate()
     const [mounted, setMounted] = useState(false)
 
+    const handleLogOut = async () => {
+        await logout()
+        await navigate({ to: "/auth/login" })
+    }
+
     useEffect(() => {
         const timeout = setTimeout(() => {
             setMounted(true)
@@ -19,7 +24,6 @@ const Header = () => {
 
         return () => clearTimeout(timeout)
     }, [])
-    const normalizedUser = user?.data ?? user
 
     return (
         <header
@@ -43,11 +47,8 @@ const Header = () => {
                     ) : (
                         <UserAvatarAction
                             btnClassName={cn("opacity-0", mounted && "opacity-100 duration-opacity-700")}
-                            nameOfUser={normalizedUser?.nameOfUser}
-                            onLogout={async () => {
-                                await logout()
-                                await navigate({ to: "/auth/login" })
-                            }}
+                            nameOfUser={user?.nameOfUser}
+                            onLogout={handleLogOut}
                         />
                     )}
 

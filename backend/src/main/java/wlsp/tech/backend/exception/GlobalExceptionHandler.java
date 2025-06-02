@@ -5,20 +5,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import wlsp.tech.backend.model.dto.ApiResponse;
+import wlsp.tech.backend.model.dto.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
+  public ResponseEntity<Object> handleGenericException(Exception ex) {
     return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(new ApiResponse<>(false, null, ex.getMessage()));
+            .body(new ErrorResponse(ex.getMessage()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiResponse<Object>> handleValidationException(MethodArgumentNotValidException ex) {
+  public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex) {
     String errorMessage = ex.getBindingResult()
             .getFieldErrors()
             .stream()
@@ -28,6 +28,6 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity
             .badRequest()
-            .body(new ApiResponse<>(false, null, errorMessage));
+            .body(new ErrorResponse(errorMessage));
   }
 }
