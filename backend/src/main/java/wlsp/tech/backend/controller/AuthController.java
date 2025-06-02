@@ -11,6 +11,7 @@ import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 import wlsp.tech.backend.service.IdService;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,63 +24,58 @@ public class AuthController {
   private final IdService idService;
 
   @PostMapping("/sign-up")
-  public ResponseEntity<ApiResponse<UserDto>> register(@RequestBody RegisterRequest request) {
+  public ResponseEntity<UserDto> register(@RequestBody RegisterRequest request) {
     if (request.nameOfUser() == null || request.nameOfUser().trim().isEmpty()) {
-      return ResponseEntity.badRequest().body(
-              new ApiResponse<>(false, null, "Name of user cannot be empty")
-      );
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     if (userRepository.findByEmail(request.email()).isPresent()) {
-      return ResponseEntity.badRequest().body(
-              new ApiResponse<>(false, null, "User already exists")
-      );
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     User user = new User(
             idService.generateId(),
             request.nameOfUser(),
             request.email(),
-            passwordEncoder.encode(request.password())
+            passwordEncoder.encode(request.password()),
+            List.of()
     );
     userRepository.save(user);
-    UserDto userDto = new UserDto(user.nameOfUser(), user.email());
 
-    return ResponseEntity.ok(new ApiResponse<>(true, userDto, null));
+    UserDto userDto = new UserDto(user.nameOfUser(), user.email(), user.receiptIds());
+    return ResponseEntity.ok(userDto);
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<UserDto>> login(
-          @RequestBody LoginRequest request,
-          HttpSession session
-  ) {
+  public ResponseEntity<UserDto> login(@RequestBody LoginRequest request, HttpSession session) {
     Optional<User> userOpt = userRepository.findByEmail(request.email());
 
     if (userOpt.isEmpty() || !passwordEncoder.matches(request.password(), userOpt.get().password())) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-              .body(new ApiResponse<>(false, null, "Invalid credentials"));
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     User user = userOpt.get();
     session.setAttribute("user", user);
 
-    return ResponseEntity.ok(new ApiResponse<>(true, new UserDto(user.nameOfUser(), user.email()), null));
+    UserDto userDto = new UserDto(user.nameOfUser(), user.email(), user.receiptIds());
+    return ResponseEntity.ok(userDto);
   }
 
   @GetMapping("/me")
-  public ResponseEntity<ApiResponse<UserDto>> getCurrentUser(HttpSession session) {
-    User user = (User) session.getAttribute("user");
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-              .body(new ApiResponse<>(false, null, "Not logged in"));
+  public ResponseEntity<UserDto> getCurrentUser(HttpSession session) {
+    Object sessionUser = session.getAttribute("user");
+
+    if (!(sessionUser instanceof User user)) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    return ResponseEntity.ok(new ApiResponse<>(true, new UserDto(user.nameOfUser(), user.email()), null));
+    UserDto userDto = new UserDto(user.nameOfUser(), user.email(), user.receiptIds());
+    return ResponseEntity.ok(userDto);
   }
 
-  @GetMapping("/logout")
-  public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(HttpSession session) {
     session.invalidate();
-    return ResponseEntity.ok(new ApiResponse<>(true, null, null));
+    return ResponseEntity.ok().build();
   }
 }

@@ -1,15 +1,13 @@
-package wlsp.tech.backend.model.receipt;
+package wlsp.tech.backend.model.token;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-@Document("Receipts")
-public record Receipt(
+@Document("UploadTokens")
+public record UploadToken(
         @Id String id,
         String userId,
-        String imageUri,
         Instant createdAt
-) {
-}
+) {}

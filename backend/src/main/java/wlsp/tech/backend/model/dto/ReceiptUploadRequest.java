@@ -6,8 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ReceiptUploadRequest {
-  // Getter & Setter
-  private String uuid;
-  private String image;
-
+  private String token;
+  private String imageUri;
 }

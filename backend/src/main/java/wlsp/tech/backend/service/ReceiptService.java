@@ -22,4 +22,8 @@ public class ReceiptService {
     return receiptRepository.findAll();
   }
 
+  public List<Receipt> getReceiptsByUserId(String userId) {
+    return receiptRepository.findByUserId(userId);
+  }
+
 }

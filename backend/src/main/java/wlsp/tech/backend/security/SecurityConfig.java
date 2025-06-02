@@ -35,7 +35,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    .ignoringRequestMatchers("/api/auth/**")
+                    .ignoringRequestMatchers("/api/auth/**", "/api/snap-receipts/**")
             )
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/**","/api/snap-receipts/**").permitAll()
