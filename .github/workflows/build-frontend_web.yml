@@ -19,6 +19,6 @@ jobs:
           projectBaseDir: frontend/web
           args:
             -D sonar.projectKey=wlsp-tech_snap-receipts_frontend_web
-            -D sonar.organization=wlsp.tech
+            -D sonar.organization=wlsp-tech
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
