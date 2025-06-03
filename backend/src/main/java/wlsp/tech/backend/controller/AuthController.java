@@ -10,16 +10,19 @@ import wlsp.tech.backend.model.dto.*;
 import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 import wlsp.tech.backend.service.IdService;
+import wlsp.tech.backend.service.SessionService;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = {"${frontend.origin}"}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class AuthController {
 
   private final UserRepository userRepository;
+  private final SessionService sessionService;
   private final PasswordEncoder passwordEncoder;
   private final IdService idService;
 
@@ -42,7 +45,7 @@ public class AuthController {
     );
     userRepository.save(user);
 
-    UserDto userDto = new UserDto(user.nameOfUser(), user.email(), user.receiptIds());
+    UserDto userDto = new UserDto(idService.generateId(), user.nameOfUser(), user.email(), user.receiptIds());
     return ResponseEntity.ok(userDto);
   }
 
@@ -55,27 +58,43 @@ public class AuthController {
     }
 
     User user = userOpt.get();
-    session.setAttribute("user", user);
+    session.setAttribute("userId", user.id());
 
-    UserDto userDto = new UserDto(user.nameOfUser(), user.email(), user.receiptIds());
+    UserDto userDto = new UserDto(
+            user.id(),
+            user.nameOfUser(),
+            user.email(),
+            user.receiptIds()
+    );
     return ResponseEntity.ok(userDto);
   }
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser(HttpSession session) {
-    Object sessionUser = session.getAttribute("user");
-
-    if (!(sessionUser instanceof User user)) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
-    UserDto userDto = new UserDto(user.nameOfUser(), user.email(), user.receiptIds());
-    return ResponseEntity.ok(userDto);
+    return sessionService.getLoggedInUser(session)
+            .map(user -> {
+              UserDto userDto = new UserDto(
+                      user.id(),
+                      user.nameOfUser(),
+                      user.email(),
+                      user.receiptIds()
+              );
+              return ResponseEntity.ok(userDto);
+            })
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
-  @PostMapping("/logout")
+  @GetMapping("/logout")
   public ResponseEntity<Void> logout(HttpSession session) {
-    session.invalidate();
-    return ResponseEntity.ok().build();
+    try {
+      if (session != null) {
+        session.invalidate();
+      }
+      return ResponseEntity.ok().build();
+    } catch (IllegalStateException e) {
+      return ResponseEntity.status(HttpStatus.GONE).build();
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
   }
 }

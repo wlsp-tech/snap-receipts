@@ -7,17 +7,13 @@ import { queryClient } from "@/lib/queryClient";
 const AUTH_BASE = "/auth";
 
 export async function loginUser(data: LoginPayload): Promise<UserDto> {
-    const response = await api.post<UserDto>(`${AUTH_BASE}/login`, data, {
-        withCredentials: true,
-    });
+    const response = await api.post<UserDto>(`${AUTH_BASE}/login`, data);
     queryClient.setQueryData(['currentUser'], response.data);
     return response.data;
 }
 
 export async function fetchCurrentUser(): Promise<UserDto> {
-    const response = await api.get<UserDto>(`${AUTH_BASE}/me`, {
-        withCredentials: true,
-    });
+    const response = await api.get<UserDto>(`${AUTH_BASE}/me`);
     queryClient.setQueryData(['currentUser'], response.data);
     return response.data;
 }

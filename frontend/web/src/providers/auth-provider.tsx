@@ -10,6 +10,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+
+        if (location.pathname === "/auth/login" || location.pathname === "/") {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
+
         const cached = queryClient.getQueryData<UserDto>(['currentUser']);
         if (cached) {
             setUser(cached);

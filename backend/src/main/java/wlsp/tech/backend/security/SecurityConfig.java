@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -25,7 +26,7 @@ import java.util.List;
 public class SecurityConfig {
 
   @Value("${frontend.origin}")
-  private String frontendOrigin;
+  private String[] frontendOrigin;
 
   private final UserDetailsService userDetailsService;
 
@@ -50,7 +51,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.178.116:8081", "http://localhost:8081"));
+    configuration.setAllowedOrigins(Arrays.asList(frontendOrigin));
     configuration.setAllowCredentials(true);
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
     configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN", "X-XSRF-TOKEN"));
