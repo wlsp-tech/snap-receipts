@@ -33,7 +33,7 @@ export function SignUpForm({className, ...props}: ComponentProps<"form">) {
             await signUpUser(data);
             toast.success("Welcome, to the bright side of the receipts!")
             form.reset();
-            await navigate({ to: '/auth/login' })
+            await navigate({ to: '/dashboard' })
         } catch (e) {
             if(e instanceof Error) {
                 toast.error(`Could not sign-up user! Error: ${e.message}`)
