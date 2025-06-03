@@ -17,5 +17,8 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: frontend/mobile
+          args:
+            -D sonar.projectKey=wlsp-tech_snap-receipts_frontend_mobile
+            -D sonar.organization=wlsp.tech
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
