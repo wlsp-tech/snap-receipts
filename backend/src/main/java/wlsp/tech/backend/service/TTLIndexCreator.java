@@ -19,7 +19,7 @@ public class TTLIndexCreator implements ApplicationRunner {
   public void run(ApplicationArguments args) {
     Index index = new Index()
             .on("createdAt", Sort.Direction.ASC)
-            .expire(3600); // 1 Stunde
+            .expire(3600);
 
     mongoTemplate.indexOps(UploadToken.class).createIndex(index);
   }
