@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/snap-receipts")
-@CrossOrigin()
+@CrossOrigin(origins = {"${frontend.origin}"}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class ReceiptController {
 
@@ -33,6 +33,16 @@ public class ReceiptController {
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
+  @PostMapping("/token/generate-upload-token")
+  public ResponseEntity<String> generateUploadToken(HttpSession session) {
+    return sessionService.getLoggedInUser(session)
+            .map(user -> {
+              UploadToken token = uploadTokenService.generateTokenForUser(user.id());
+              return ResponseEntity.ok(token.id());
+            })
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+  }
+
   @PostMapping("/token/upload-by-token")
   public ResponseEntity<Receipt> uploadViaToken(@RequestBody ReceiptUploadRequest request, HttpSession session) {
     Optional<UploadToken> tokenOpt = uploadTokenService.validateToken(request.getToken());
@@ -41,6 +51,11 @@ public class ReceiptController {
     }
 
     UploadToken token = tokenOpt.get();
+
+    if (token.createdAt().isBefore(Instant.now().minusSeconds(3600))) {
+      uploadTokenService.invalidateToken(token.id());
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
     Receipt receipt = new Receipt(
             idService.generateId(),
@@ -56,7 +71,5 @@ public class ReceiptController {
 
     return ResponseEntity.ok(saved);
   }
-
-
-
+  
 }
