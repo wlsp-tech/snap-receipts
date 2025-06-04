@@ -13,6 +13,7 @@ import wlsp.tech.backend.model.dto.LoginRequest;
 import wlsp.tech.backend.model.dto.RegisterRequest;
 import wlsp.tech.backend.model.dto.UserDto;
 import wlsp.tech.backend.model.receipt.Receipt;
+import wlsp.tech.backend.model.token.UploadToken;
 import wlsp.tech.backend.service.*;
 
 import java.time.Instant;
@@ -38,6 +39,9 @@ class ReceiptControllerTest {
 
   @Autowired
   private IdService idService;
+
+  @Autowired
+  private UploadTokenService uploadTokenService;
 
   @Test
   void shouldGetReceipts_withLoggedInUser_returnsReceipts() throws Exception {
@@ -148,4 +152,63 @@ class ReceiptControllerTest {
   }
 
 
+  @Test
+  void shouldRejectUploadWithInvalidToken() throws Exception {
+    String invalidToken = "non-existent-token-id";
+
+    String uploadJson = """
+            {
+                "token": "%s",
+                "imageUri": "https://example.com/fake.jpg"
+            }
+            """.formatted(invalidToken);
+
+    mockMvc.perform(post("/api/snap-receipts/token/upload-by-token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(uploadJson))
+            .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void shouldRejectUploadWithExpiredToken() throws Exception {
+    // Create and register user
+    String email = "expired-token@example.com";
+    mockMvc.perform(post("/api/auth/sign-up")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(new RegisterRequest("Expired Token User", email, "password"))))
+            .andExpect(status().isOk());
+
+    MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(new LoginRequest(email, "password"))))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+
+    assert session != null;
+    MvcResult meResult = mockMvc.perform(get("/api/auth/me").session(session))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    UserDto userDto = objectMapper.readValue(meResult.getResponse().getContentAsString(), UserDto.class);
+
+    UploadToken expiredToken = new UploadToken(
+            idService.generateId(),
+            userDto.id(),
+            Instant.now().minusSeconds(7200)
+    );
+
+    String uploadJson = """
+            {
+                "token": "%s",
+                "imageUri": "https://example.com/expired.jpg"
+            }
+            """.formatted(expiredToken.id());
+
+    mockMvc.perform(post("/api/snap-receipts/token/upload-by-token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(uploadJson))
+            .andExpect(status().isUnauthorized());
+  }
 }
