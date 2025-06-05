@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_authenticated')({
             try {
                 user = await fetchCurrentUser();
                 queryClient.setQueryData(['currentUser'], user);
+
             } catch {
                 throw redirect({
                     to: '/auth/login',

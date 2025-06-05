@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {View, Text, Button, StyleSheet, Alert, Pressable} from "react-native";
+import {View, Text, StyleSheet, Pressable} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen() {
@@ -7,18 +7,16 @@ export default function HomeScreen() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadToken = async () => {
+        (async () => {
             try {
                 const stored = await AsyncStorage.getItem("uuid");
                 setUuid(stored);
             } catch (error) {
-                Alert.alert("Fehler beim Laden des Tokens", String(error));
+                alert("Fehler beim Laden des Tokens" + String(error));
             } finally {
                 setLoading(false);
             }
-        };
-
-        loadToken();
+        })();
     }, []);
 
     if (loading) {
@@ -31,11 +29,11 @@ export default function HomeScreen() {
                 <>
                     <Text style={styles.text}>✅ Aktiver Token gefunden: {uuid}</Text>
                     <Pressable
-                        onPress={() => Alert.alert("Info", "Hier würdest du zum Upload weitergeleitet.")}>
+                        onPress={() => alert("Info" + "Hier würdest du zum Upload weitergeleitet.")}>
                         <Text>Zum Dokument-Upload</Text>
                     </Pressable>
                     <Pressable
-                        onPress={() => Alert.alert("Info", "Token würde hier gelöscht werden.")}>
+                        onPress={() => alert("Info" + "Token würde hier gelöscht werden.")}>
                         <Text>Prozess zurücksetzen</Text>
                     </Pressable>
                 </>
@@ -54,7 +52,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
         justifyContent: "center",
         alignItems: "center",
     },

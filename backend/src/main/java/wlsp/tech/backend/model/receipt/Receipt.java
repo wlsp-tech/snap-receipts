@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-@Document("Receipts")
+@Document("receipts")
 public record Receipt(
         @Id String id,
         String userId,

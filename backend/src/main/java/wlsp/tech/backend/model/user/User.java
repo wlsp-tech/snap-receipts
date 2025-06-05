@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document("Users")
+@Document("users")
 public record User(
         @Id String id,
         String nameOfUser,

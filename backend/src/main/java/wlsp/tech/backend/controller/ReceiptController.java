@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import wlsp.tech.backend.model.dto.ReceiptUploadRequest;
+import org.springframework.web.multipart.MultipartFile;
 import wlsp.tech.backend.model.receipt.Receipt;
 import wlsp.tech.backend.model.token.UploadToken;
 import wlsp.tech.backend.service.*;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class ReceiptController {
   private final UserService userService;
   private final UploadTokenService uploadTokenService;
   private final IdService idService;
+  private final CloudinaryService cloudinaryService;
 
   @GetMapping("/receipts")
   public ResponseEntity<List<Receipt>> getReceipts(HttpSession session) {
@@ -43,9 +45,12 @@ public class ReceiptController {
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
-  @PostMapping("/token/upload-by-token")
-  public ResponseEntity<Receipt> uploadViaToken(@RequestBody ReceiptUploadRequest request, HttpSession session) {
-    Optional<UploadToken> tokenOpt = uploadTokenService.validateToken(request.getToken());
+  @PostMapping(value = "/token/upload-by-token", consumes = {"multipart/form-data"})
+  public ResponseEntity<Receipt> uploadViaToken(
+          @RequestPart("file") MultipartFile file,
+          @RequestParam("token") String tokenId
+  ) {
+    Optional<UploadToken> tokenOpt = uploadTokenService.validateToken(tokenId);
     if (tokenOpt.isEmpty()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -57,18 +62,28 @@ public class ReceiptController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    Receipt receipt = new Receipt(
-            idService.generateId(),
-            token.userId(),
-            request.getImageUri(),
-            Instant.now()
-    );
+    try {
+      // Upload zu Cloudinary
+      String cloudinaryUrl = cloudinaryService.upLoadFile(file);
 
-    Receipt saved = receiptService.saveReceipt(receipt);
-    userService.addReceiptToUser(token.userId(), saved.id());
+      // Receipt speichern
+      Receipt receipt = new Receipt(
+              idService.generateId(),
+              token.userId(),
+              cloudinaryUrl,
+              Instant.now()
+      );
 
-    uploadTokenService.invalidateToken(token.id());
+      Receipt saved = receiptService.saveReceipt(receipt);
+      userService.addReceiptToUser(token.userId(), saved.id());
 
-    return ResponseEntity.ok(saved);
+      uploadTokenService.invalidateToken(token.id());
+
+      return ResponseEntity.ok(saved);
+
+    } catch (IOException e) {
+      e.printStackTrace();  // Log Fehler
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
   }
 }

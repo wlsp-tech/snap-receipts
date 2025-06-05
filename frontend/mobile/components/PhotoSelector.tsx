@@ -1,39 +1,52 @@
-import React, {useRef, useState} from "react";
-import {ActivityIndicator, Modal, Platform, Pressable, StyleSheet, Text, View} from "react-native";
+import React, { useRef, useState } from "react";
+import {
+    ActivityIndicator,
+    Modal,
+    Platform,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import {BlurView} from 'expo-blur';
+import { BlurView } from "expo-blur";
+import {IconSymbol} from "@/components/ui/IconSymbol";
 
 type Props = {
-    onSelect: (uri: string, base64?: string) => void;
+    onSelect: (uri: string, type: string) => void;
     readyToUploadFile: boolean;
     setReadyToUploadFile: (state: boolean) => void;
-    loading: boolean;
     handleUploadCallback: () => void;
 };
 
-export default function PhotoSelector({onSelect, readyToUploadFile, setReadyToUploadFile, loading, handleUploadCallback}: Readonly<Props>) {
+export default function PhotoSelector({
+  onSelect,
+  readyToUploadFile,
+  setReadyToUploadFile,
+  handleUploadCallback,
+}: Readonly<Props>) {
     const [modalVisible, setModalVisible] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const openCamera = async () => {
-        const {status} = await ImagePicker.requestCameraPermissionsAsync();
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== "granted") {
-            alert("Kamera-Zugriff wird benötigt!");
+            alert("Need permisson to use camera!");
             return;
         }
 
         const result = await ImagePicker.launchCameraAsync({
-            quality: 0.7,
-            base64: true,
-            mediaTypes: "images",
+            quality: 0.65,
+            allowsEditing: false,
+            base64: false,
+            mediaTypes: ["images", "videos"],
         });
-        setReadyToUploadFile(true)
 
         if (!result.canceled) {
-            const {uri, base64} = result.assets[0];
-            setReadyToUploadFile(true)
+            const asset = result.assets[0];
+            setReadyToUploadFile(true);
             setModalVisible(false);
-            onSelect(uri, base64 ?? undefined);
+            onSelect(asset.uri, asset.type || "image/jpeg");
         }
     };
 
@@ -44,37 +57,38 @@ export default function PhotoSelector({onSelect, readyToUploadFile, setReadyToUp
     const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         const uri = URL.createObjectURL(file);
-        const reader = new FileReader();
-        reader.onload = () => {
-            const result = reader.result;
-            if (typeof result === "string") {
-                const base64 = result.split(",")[1];
-                onSelect(uri, base64);
-            }
-        };
-        reader.readAsDataURL(file);
+        const mime = file.type;
         setModalVisible(false);
-        setReadyToUploadFile(true)
+        setReadyToUploadFile(true);
+        onSelect(uri, mime);
     };
 
     return (
         <View>
-            <Modal transparent animationType="fade" visible={modalVisible}
-                   onRequestClose={() => setModalVisible(false)}>
+            <Modal
+                transparent
+                animationType="fade"
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
                 <BlurView intensity={8} tint="default" style={styles.modalView}>
                     <View style={styles.centeredView}>
                         <View style={styles.modalView}>
                             <Pressable style={styles.button} onPress={openCamera}>
-                                <Text style={styles.text}>Take a photo</Text>
+                                <Text style={styles.text}>Take photo</Text>
                             </Pressable>
                             <Pressable style={styles.button} onPress={openFilePicker}>
-                                <Text style={styles.text}>Upload from library</Text>
+                                <Text style={styles.text}>Choose from Device</Text>
                             </Pressable>
-                            <Pressable style={[styles.button, styles.destructiveBtn]}
-                                       onPress={() => setModalVisible(false)}>
-                                <Text style={styles.text}>Cancel</Text>
+                            <Pressable
+                                style={[styles.button, styles.destructiveBtn]}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.text}>
+                                    <IconSymbol name={"0.circle.fill.ar"} color={"black"} />
+                                    Cancel
+                                </Text>
                             </Pressable>
                         </View>
                     </View>
@@ -86,27 +100,30 @@ export default function PhotoSelector({onSelect, readyToUploadFile, setReadyToUp
                     ref={fileInputRef}
                     type="file"
                     accept="image/*,application/pdf"
-                    style={{display: "none"}}
+                    style={{ display: "none" }}
                     onChange={onFileChange}
                 />
             )}
 
             <View style={styles.btnContainer}>
                 {!readyToUploadFile && (
-                    <Pressable style={[styles.button, styles.wideBtn]} onPress={() => setModalVisible(true)}>
-                        <Text style={styles.text}>Scan Document</Text>
+                    <Pressable
+                        style={[styles.button, styles.wideBtn]}
+                        onPress={() => setModalVisible(true)}
+                    >
+                        <Text style={styles.text}>Scann document</Text>
                     </Pressable>
                 )}
-                {readyToUploadFile
-                    && (
-                        <Pressable style={[styles.button, styles.wideBtn]} onPress={() => handleUploadCallback()}>
+                {readyToUploadFile && (
+                    <Pressable
+                        style={[styles.button, styles.wideBtn]}
+                        onPress={handleUploadCallback}
+                    >
                         <Text style={styles.text}>
-                            {loading &&
-                                <ActivityIndicator size="small" color="green" />
-                            } Upload Document
+                            upload document
                         </Text>
-                        </Pressable>
-                    )}
+                    </Pressable>
+                )}
             </View>
         </View>
     );
@@ -116,7 +133,7 @@ const styles = StyleSheet.create({
     centeredView: {
         flex: 1,
         justifyContent: "flex-end",
-        alignItems: "center"
+        alignItems: "center",
     },
     modalView: {
         display: "flex",
@@ -125,27 +142,27 @@ const styles = StyleSheet.create({
         height: "100%",
         padding: 20,
         paddingBottom: 8,
-        gap: 12
+        gap: 12,
     },
     button: {
         backgroundColor: "#18181C",
         padding: 12,
-        borderRadius: 6,
-        alignItems: "center"
+        borderRadius: 12,
+        alignItems: "center",
     },
     wideBtn: {
         width: "75%",
-        alignSelf: "center"
+        alignSelf: "center",
     },
     destructiveBtn: {
-        backgroundColor: "#E7000B"
+        backgroundColor: "#E7000B",
     },
     btnContainer: {
-        alignItems: "center"
+        alignItems: "center",
     },
     text: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "bold"
+        fontWeight: "bold",
     },
 });
