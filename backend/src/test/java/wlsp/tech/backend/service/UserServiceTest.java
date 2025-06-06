@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -25,7 +26,6 @@ class UserServiceTest {
 
   @Test
   void addReceiptToUser_shouldAddReceiptIdAndSaveUpdatedUser() {
-    // Setup
     String userId = "user123";
     String receiptId = "receipt456";
     User existingUser = new User(
@@ -33,16 +33,14 @@ class UserServiceTest {
             "Alice",
             "alice@example.com",
             "hashedPassword",
-            new ArrayList<>(List.of("oldReceiptId"))  // mutable list statt List.of()
+            new ArrayList<>(List.of("oldReceiptId"))
     );
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
     when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    // Call method
     User updatedUser = userService.addReceiptToUser(userId, receiptId);
 
-    // Verify
     assertNotNull(updatedUser);
     assertEquals(userId, updatedUser.getId());
     assertTrue(updatedUser.getReceiptIds().contains("oldReceiptId"));
@@ -64,5 +62,29 @@ class UserServiceTest {
     assertThrows(RuntimeException.class, () -> userService.addReceiptToUser(userId, "someReceiptId"));
     verify(userRepository).findById(userId);
     verify(userRepository, never()).save(any());
+  }
+
+  @Test
+  void removeReceiptFromUser_shouldRemoveReceiptIdAndSaveUpdatedUser() {
+
+    String userId = "user123";
+    String receiptIdToRemove = "receipt456";
+    User existingUser = new User(
+            userId,
+            "Alice",
+            "alice@example.com",
+            "hashedPassword",
+            new ArrayList<>(List.of("receipt123", "receipt456", "receipt789"))
+    );
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+    when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    userService.removeReceiptFromUser(userId, receiptIdToRemove);
+
+    assertFalse(existingUser.getReceiptIds().contains(receiptIdToRemove));
+    assertThat(existingUser.getReceiptIds()).containsExactlyInAnyOrder("receipt123", "receipt789");
+    verify(userRepository).findById(userId);
+    verify(userRepository).save(existingUser);
   }
 }

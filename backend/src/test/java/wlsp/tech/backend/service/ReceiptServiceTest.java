@@ -62,7 +62,16 @@ class ReceiptServiceTest {
     List<Receipt> result = receiptService.getReceiptsByUserId(userId);
 
     assertEquals(1, result.size());
-    assertEquals(userId, result.get(0).userId());
+    assertEquals(userId, result.getFirst().userId());
     verify(receiptRepository).findByUserId(userId);
+  }
+
+  @Test
+  void deleteReceiptById_shouldCallRepositoryDeleteById() {
+    String receiptId = "receipt123";
+
+    receiptService.deleteReceiptById(receiptId);
+
+    verify(receiptRepository).deleteById(receiptId);
   }
 }

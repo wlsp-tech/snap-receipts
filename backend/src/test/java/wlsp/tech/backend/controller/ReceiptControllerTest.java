@@ -230,12 +230,25 @@ class ReceiptControllerTest {
     Receipt receipt = new Receipt(idService.generateId(), "someUserId", "https://example.com/receipt.jpg", Instant.now());
     receiptRepository.save(receipt);
 
-
     mockMvc.perform(delete("/api/snap-receipts/receipts/{id}", receipt.id()))
             .andExpect(status().isUnauthorized());
 
-
     assertThat(receiptRepository.findById(receipt.id())).isPresent();
+  }
+
+  @Test
+  void deleteReceipt_withValidSessionAndOwnership_returnsNoContent() throws Exception {
+    String email = "delete-owner@example.com";
+    registerUser(email, "secret");
+    MockHttpSession session = loginUser("secret");
+    String userId = getUserIdFromSession(session);
+
+    Receipt receipt = new Receipt(idService.generateId(), userId, "https://img.jpg", Instant.now());
+    receiptRepository.save(receipt);
+
+    mockMvc.perform(delete("/api/snap-receipts/receipts/" + receipt.id()).session(session))
+            .andExpect(status().isNoContent());
+    assertThat(receiptRepository.findById(receipt.id())).isEmpty();
   }
 
 }
