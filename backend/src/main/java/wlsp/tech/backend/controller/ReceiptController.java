@@ -31,7 +31,7 @@ public class ReceiptController {
   @GetMapping("/receipts")
   public ResponseEntity<List<Receipt>> getReceipts(HttpSession session) {
     return sessionService.getLoggedInUser(session)
-            .map(user -> ResponseEntity.ok(receiptService.getReceiptsByUserId(user.id())))
+            .map(user -> ResponseEntity.ok(receiptService.getReceiptsByUserId(user.getId())))
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
@@ -39,7 +39,7 @@ public class ReceiptController {
   public ResponseEntity<String> generateUploadToken(HttpSession session) {
     return sessionService.getLoggedInUser(session)
             .map(user -> {
-              UploadToken token = uploadTokenService.generateTokenForUser(user.id());
+              UploadToken token = uploadTokenService.generateTokenForUser(user.getId());
               return ResponseEntity.ok(token.id());
             })
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
@@ -57,16 +57,15 @@ public class ReceiptController {
 
     UploadToken token = tokenOpt.get();
 
+    // Token 1 Stunde gültig
     if (token.createdAt().isBefore(Instant.now().minusSeconds(3600))) {
       uploadTokenService.invalidateToken(token.id());
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     try {
-      // Upload zu Cloudinary
-      String cloudinaryUrl = cloudinaryService.upLoadFile(file);
+      String cloudinaryUrl = cloudinaryService.uploadFile(file);
 
-      // Receipt speichern
       Receipt receipt = new Receipt(
               idService.generateId(),
               token.userId(),
@@ -75,6 +74,7 @@ public class ReceiptController {
       );
 
       Receipt saved = receiptService.saveReceipt(receipt);
+
       userService.addReceiptToUser(token.userId(), saved.id());
 
       uploadTokenService.invalidateToken(token.id());
@@ -82,8 +82,29 @@ public class ReceiptController {
       return ResponseEntity.ok(saved);
 
     } catch (IOException e) {
-      e.printStackTrace();  // Log Fehler
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
+
+  @DeleteMapping("/receipts/{id}")
+  public ResponseEntity<Void> deleteReceipt(
+          @PathVariable String id,
+          HttpSession session
+  ) {
+    return sessionService.getLoggedInUser(session)
+            .<ResponseEntity<Void>>map(user -> {
+              List<Receipt> userReceipts = receiptService.getReceiptsByUserId(user.getId());
+              boolean ownsReceipt = userReceipts.stream().anyMatch(r -> r.id().equals(id));
+              if (!ownsReceipt) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+              }
+
+              receiptService.deleteReceiptById(id);
+              userService.removeReceiptFromUser(user.getId(), id);
+
+              return ResponseEntity.noContent().build();
+            })
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+  }
+
 }

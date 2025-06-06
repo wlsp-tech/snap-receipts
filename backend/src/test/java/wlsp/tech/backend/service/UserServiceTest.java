@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ class UserServiceTest {
             "Alice",
             "alice@example.com",
             "hashedPassword",
-            List.of("oldReceiptId")
+            new ArrayList<>(List.of("oldReceiptId"))  // mutable list statt List.of()
     );
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
@@ -43,16 +44,17 @@ class UserServiceTest {
 
     // Verify
     assertNotNull(updatedUser);
-    assertEquals(userId, updatedUser.id());
-    assertTrue(updatedUser.receiptIds().contains("oldReceiptId"));
-    assertTrue(updatedUser.receiptIds().contains(receiptId));
-    assertEquals(existingUser.nameOfUser(), updatedUser.nameOfUser());
-    assertEquals(existingUser.email(), updatedUser.email());
-    assertEquals(existingUser.password(), updatedUser.password());
+    assertEquals(userId, updatedUser.getId());
+    assertTrue(updatedUser.getReceiptIds().contains("oldReceiptId"));
+    assertTrue(updatedUser.getReceiptIds().contains(receiptId));
+    assertEquals(existingUser.getNameOfUser(), updatedUser.getNameOfUser());
+    assertEquals(existingUser.getEmail(), updatedUser.getEmail());
+    assertEquals(existingUser.getPassword(), updatedUser.getPassword());
 
     verify(userRepository).findById(userId);
     verify(userRepository).save(updatedUser);
   }
+
 
   @Test
   void addReceiptToUser_whenUserNotFound_shouldThrowException() {
