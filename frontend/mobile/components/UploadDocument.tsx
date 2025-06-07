@@ -1,60 +1,74 @@
-import React, {useState} from "react";
-import {ActivityIndicator, StyleSheet, Text, View} from "react-native";
+import {useEffect, useState} from "react";
+import {
+    Platform,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import PhotoSelector from "./PhotoSelector";
-import FilePreview from "./FilePreview";
+import ImageCompressor from "@/components/ImageCompressor";
+import LottieStatus from "@/components/LottieStatus";
 
-export default function UploadDocument({token}: Readonly<{ token: string | string[] }>) {
-    const [uri, setUri] = useState<string | null>(null);
-    const [base64, setBase64] = useState<string | undefined>(undefined);
+export default function UploadDocument({
+                                           token,
+                                       }: {
+    token: string | string[];
+}) {
+    const [fileUri, setFileUri] = useState<string | null>(null);
+    const [compressedUri, setCompressedUri] = useState<string | null>(null);
     const [readyToUploadFile, setReadyToUploadFile] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [isUploaded, setIsUploaded] = useState<boolean>(false);
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
-    const handleSelect = (fileUri: string, base64data?: string) => {
-        setUri(fileUri);
-        setBase64(base64data);
-        setReadyToUploadFile(true);
+    const handleSelect = (uri: string) => {
+        setFileUri(uri);
+        setStatus("idle");
+        setReadyToUploadFile(false);
     };
 
     const handleUpload = async () => {
-        if (!base64 || !token) return;
+        if (!compressedUri || !token) return;
+
         const authToken = Array.isArray(token) ? token[0] : token;
 
-        if (!authToken) {
-            alert("Token fehlt oder ist ungültig.");
-            return;
-        }
-
-        setLoading(true);
+        setStatus("loading");
 
         try {
+            const formData = new FormData();
+
+            if (Platform.OS === "web") {
+                const response = await fetch(compressedUri);
+                const blob = await response.blob();
+                formData.append("file", blob, "upload.jpg");
+            } else {
+                formData.append("file", {
+                    uri: compressedUri,
+                    name: "upload.jpg",
+                    type: "image/jpeg",
+                } as any);
+            }
+
+            formData.append("token", authToken);
+
             const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/snap-receipts/token/upload-by-token`, {
                 method: "POST",
+                body: formData,
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${authToken}`,
                 },
-                body: JSON.stringify({
-                    token: authToken,
-                    imageUri: base64,
-                }),
             });
 
-            if (!response.ok) throw new Error("Upload fehlgeschlagen");
-
-            if (response.ok) {
-                setReadyToUploadFile(false);
-                setUri(null);
-                setBase64(undefined);
-                setIsUploaded(true);
+            if (!response.ok) {
+                throw new Error("Upload failed");
             }
-        } catch (error) {
-            console.error(error);
-            alert("Fehler beim Hochladen.");
-            setLoading(false)
-        } finally {
-            setLoading(false);
+
+            await response.json();
+            setFileUri(null);
+            setCompressedUri(null);
+            setReadyToUploadFile(false);
+            setStatus("success");
+        } catch {
+            setStatus("error");
         }
     };
 
@@ -62,32 +76,33 @@ export default function UploadDocument({token}: Readonly<{ token: string | strin
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <View style={styles.innerContainer}>
-                    <View style={styles.previewWrapper}>
-                        {loading && !isUploaded
-                            ? (
-                                <>
-                                    <ActivityIndicator size="large"/>
-                                    <Text>Uploading document..</Text>
-                                </>
-                            )
-                            :
-                            !loading && isUploaded && (
-                                <Text>Document uploaded successfully!</Text>
-                            )
-                        }
+                    <LottieStatus status={status}/>
 
-                        {!loading && !isUploaded && (
-                            <FilePreview uri={uri}/>
-                        )}
-                    </View>
+                    {status === "success" && <View style={styles.statusMessage}>
+                        <Text style={styles.statusText}>Document uploaded successfully!</Text>
+                        <Text style={styles.statusText}>Continue in your other device.</Text>
+                    </View>}
+                    {status === "error" && (
+                        <View style={styles.statusMessage}>
+                            <Text style={styles.statusText}>Upload failed. Please try again.</Text>
+                        </View>
+                    )}
+
+                    {status === "idle" && (
+                        <ImageCompressor
+                            uri={fileUri}
+                            setCompressedUri={setCompressedUri}
+                            setReadyToUploadFile={setReadyToUploadFile}
+                        />
+                    )}
                 </View>
-                {!loading && !isUploaded && (
+
+                {status === "idle" && (
                     <View style={styles.buttonWrapper}>
                         <PhotoSelector
                             onSelect={handleSelect}
                             readyToUploadFile={readyToUploadFile}
                             setReadyToUploadFile={setReadyToUploadFile}
-                            loading={loading}
                             handleUploadCallback={handleUpload}
                         />
                     </View>
@@ -100,32 +115,32 @@ export default function UploadDocument({token}: Readonly<{ token: string | strin
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        position: "relative",
     },
     innerContainer: {
         flex: 1,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    previewWrapper: {
-        padding: 16,
         justifyContent: "center",
         alignItems: "center",
-        height: "85%",
-        width: "85%"
+        width: "75%",
+        marginHorizontal: "auto",
+        paddingVertical: 40,
     },
     buttonWrapper: {
         position: "sticky",
         bottom: 0,
-        left: 0,
-        right: 0,
-        display: "flex",
+        left: 10,
+        right: 10,
         justifyContent: "center",
         paddingVertical: 10,
-        marginHorizontal: -20,
         backgroundColor: "#f5f5f5",
-        boxShadow: "0 -5px 6px rgba(0, 0, 0, 0.18)",
         elevation: 11,
     },
+    statusMessage: {
+        position: "absolute",
+        bottom: 150,
+    },
+    statusText: {
+        fontSize: 18,
+        fontWeight: "500",
+        textAlign: "center"
+    }
 });

@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-@Document("UploadTokens")
+@Document("uploadTokens")
 public record UploadToken(
         @Id String id,
         String userId,

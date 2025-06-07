@@ -61,16 +61,23 @@ export type UserAvatarProps = {
     btnClassName?: string;
 };
 
-export type UserAvatarActionsProps = {
-    user: UserDto;
-    className?: string;
-    onLogout?: () => void;
-    btnClassName?: string;
-}
-
 export interface ReceiptProps {
     id: string;
     uuid: string;
     imageUri: string;
     createdAt: string
+}
+
+export type GridLayoutProps = {
+    children: ReactNode;
+    className?: string;
+    gap?: string;
+    gridCols: Partial<{
+        base: number;
+        sm: number;
+        md: number;
+        lg: number;
+        xl: number;
+        '2xl'?: number;
+    }>
 }

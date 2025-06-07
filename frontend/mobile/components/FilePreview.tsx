@@ -40,14 +40,8 @@ export default function FilePreview({ uri }: Readonly<Props>) {
 
 const styles = StyleSheet.create({
     imageContainer: {
-        flex: 1,
         width: "100%",
         height: "100%",
-        borderRadius: 8,
-        overflow: "hidden",
-        backgroundColor: "#f0f0f0",
-        justifyContent: "center",
-        alignItems: "center",
     },
     image: {
         width: "100%",

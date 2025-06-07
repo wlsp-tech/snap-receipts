@@ -26,4 +26,7 @@ public class ReceiptService {
     return receiptRepository.findByUserId(userId);
   }
 
+  public void deleteReceiptById(String receiptId) {
+    receiptRepository.deleteById(receiptId);
+  }
 }

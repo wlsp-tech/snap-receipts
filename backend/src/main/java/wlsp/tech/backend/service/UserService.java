@@ -5,9 +5,6 @@ import org.springframework.stereotype.Service;
 import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -16,18 +13,13 @@ public class UserService {
 
   public User addReceiptToUser(String userId, String receiptId) {
     User user = userRepository.findById(userId).orElseThrow();
+    user.addReceiptId(receiptId);
+    return userRepository.save(user);
+  }
 
-    ArrayList<String> receiptIds = new ArrayList<>(user.receiptIds() == null ? List.of() : user.receiptIds());
-    receiptIds.add(receiptId);
-
-    User updatedUser = new User(
-            user.id(),
-            user.nameOfUser(),
-            user.email(),
-            user.password(),
-            receiptIds
-    );
-
-    return userRepository.save(updatedUser);
+  public void removeReceiptFromUser(String userId, String receiptId) {
+    User user = userRepository.findById(userId).orElseThrow();
+    user.removeReceiptId(receiptId);
+    userRepository.save(user);
   }
 }

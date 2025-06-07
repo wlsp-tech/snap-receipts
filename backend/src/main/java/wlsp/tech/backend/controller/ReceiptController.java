@@ -5,11 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import wlsp.tech.backend.model.dto.ReceiptUploadRequest;
+import org.springframework.web.multipart.MultipartFile;
 import wlsp.tech.backend.model.receipt.Receipt;
 import wlsp.tech.backend.model.token.UploadToken;
 import wlsp.tech.backend.service.*;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +26,12 @@ public class ReceiptController {
   private final UserService userService;
   private final UploadTokenService uploadTokenService;
   private final IdService idService;
+  private final CloudinaryService cloudinaryService;
 
   @GetMapping("/receipts")
   public ResponseEntity<List<Receipt>> getReceipts(HttpSession session) {
     return sessionService.getLoggedInUser(session)
-            .map(user -> ResponseEntity.ok(receiptService.getReceiptsByUserId(user.id())))
+            .map(user -> ResponseEntity.ok(receiptService.getReceiptsByUserId(user.getId())))
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
@@ -37,38 +39,72 @@ public class ReceiptController {
   public ResponseEntity<String> generateUploadToken(HttpSession session) {
     return sessionService.getLoggedInUser(session)
             .map(user -> {
-              UploadToken token = uploadTokenService.generateTokenForUser(user.id());
+              UploadToken token = uploadTokenService.generateTokenForUser(user.getId());
               return ResponseEntity.ok(token.id());
             })
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
-  @PostMapping("/token/upload-by-token")
-  public ResponseEntity<Receipt> uploadViaToken(@RequestBody ReceiptUploadRequest request, HttpSession session) {
-    Optional<UploadToken> tokenOpt = uploadTokenService.validateToken(request.getToken());
+  @PostMapping(value = "/token/upload-by-token", consumes = {"multipart/form-data"})
+  public ResponseEntity<Receipt> uploadViaToken(
+          @RequestPart("file") MultipartFile file,
+          @RequestParam("token") String tokenId
+  ) {
+    Optional<UploadToken> tokenOpt = uploadTokenService.validateToken(tokenId);
     if (tokenOpt.isEmpty()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     UploadToken token = tokenOpt.get();
 
+    // Token 1 Stunde gültig
     if (token.createdAt().isBefore(Instant.now().minusSeconds(3600))) {
       uploadTokenService.invalidateToken(token.id());
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    Receipt receipt = new Receipt(
-            idService.generateId(),
-            token.userId(),
-            request.getImageUri(),
-            Instant.now()
-    );
+    try {
+      String cloudinaryUrl = cloudinaryService.uploadFile(file);
 
-    Receipt saved = receiptService.saveReceipt(receipt);
-    userService.addReceiptToUser(token.userId(), saved.id());
+      Receipt receipt = new Receipt(
+              idService.generateId(),
+              token.userId(),
+              cloudinaryUrl,
+              Instant.now()
+      );
 
-    uploadTokenService.invalidateToken(token.id());
+      Receipt saved = receiptService.saveReceipt(receipt);
 
-    return ResponseEntity.ok(saved);
+      userService.addReceiptToUser(token.userId(), saved.id());
+
+      uploadTokenService.invalidateToken(token.id());
+
+      return ResponseEntity.ok(saved);
+
+    } catch (IOException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
   }
+
+  @DeleteMapping("/receipts/{id}")
+  public ResponseEntity<Void> deleteReceipt(
+          @PathVariable String id,
+          HttpSession session
+  ) {
+    return sessionService.getLoggedInUser(session)
+            .<ResponseEntity<Void>>map(user -> {
+              List<Receipt> userReceipts = receiptService.getReceiptsByUserId(user.getId());
+              boolean ownsReceipt = userReceipts.stream().anyMatch(r -> r.id().equals(id));
+              if (!ownsReceipt) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+              }
+
+              receiptService.deleteReceiptById(id);
+              userService.removeReceiptFromUser(user.getId(), id);
+
+              return ResponseEntity.noContent().build();
+            })
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+  }
+
 }

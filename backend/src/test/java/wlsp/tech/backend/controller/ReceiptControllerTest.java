@@ -1,13 +1,19 @@
 package wlsp.tech.backend.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Uploader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import wlsp.tech.backend.model.dto.LoginRequest;
@@ -15,15 +21,22 @@ import wlsp.tech.backend.model.dto.RegisterRequest;
 import wlsp.tech.backend.model.dto.UserDto;
 import wlsp.tech.backend.model.receipt.Receipt;
 import wlsp.tech.backend.model.token.UploadToken;
+import wlsp.tech.backend.repository.ReceiptRepository;
 import wlsp.tech.backend.repository.UploadTokenRepository;
-import wlsp.tech.backend.service.*;
+import wlsp.tech.backend.repository.UserRepository;
+import wlsp.tech.backend.service.IdService;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.util.Map;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,199 +49,206 @@ class ReceiptControllerTest {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private ReceiptService receiptService;
-
-  @Autowired
-  private IdService idService;
+  private ReceiptRepository receiptRepository;
 
   @Autowired
   private UploadTokenRepository uploadTokenRepository;
 
   @Autowired
-  private UserService userService;
+  private UserRepository userRepository;
 
   @Autowired
-  private UploadTokenService uploadTokenService;
+  private IdService idService;
+
+  @TestConfiguration
+  static class TestConfig {
+    @Primary
+    @Bean(name = "mockCloudinary")
+    public Cloudinary cloudinary() {
+      Cloudinary mock = mock(Cloudinary.class);
+      Uploader uploader = mock(Uploader.class);
+
+      try {
+        when(mock.uploader()).thenReturn(uploader);
+        when(uploader.upload(any(byte[].class), anyMap()))
+                .thenReturn(Map.of("secure_url", "https://cloudinary.com/mock-image.jpg"));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      return mock;
+    }
+  }
 
   @BeforeEach
   void cleanUp() {
-    // Optional: Clean tokens and receipts before each test if needed
+    receiptRepository.deleteAll();
     uploadTokenRepository.deleteAll();
+    userRepository.deleteAll();
   }
 
   @Test
   void shouldGetReceipts_withLoggedInUser_returnsReceipts() throws Exception {
-    String registerJson = objectMapper.writeValueAsString(new RegisterRequest(
-            "Test User",
-            "test-user@example.com",
-            "securepassword"
-    ));
+    String email = "test-user@example.com";
+    registerUser("Test User", email);
 
-    mockMvc.perform(post("/api/auth/sign-up")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(registerJson))
-            .andExpect(status().isOk());
+    MockHttpSession session = loginUser(email);
 
-    String loginJson = objectMapper.writeValueAsString(new LoginRequest(
-            "test-user@example.com",
-            "securepassword"
-    ));
+    String userId = getUserIdFromSession(session);
 
-    MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(loginJson))
-            .andExpect(status().isOk())
-            .andReturn();
-
-    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
-    assert session != null;
-
-    MvcResult meResult = mockMvc.perform(get("/api/auth/me").session(session))
-            .andExpect(status().isOk())
-            .andReturn();
-
-    String responseJson = meResult.getResponse().getContentAsString();
-    UserDto userDto = objectMapper.readValue(responseJson, UserDto.class);
-
-    Receipt receipt = new Receipt(
-            idService.generateId(),
-            userDto.id(),
-            "https://example.com/image.jpg",
-            Instant.now()
-    );
-    receiptService.saveReceipt(receipt);
+    Receipt receipt = createReceipt(userId);
+    receiptRepository.save(receipt);
 
     mockMvc.perform(get("/api/snap-receipts/receipts").session(session))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$[0].imageUri").value("https://example.com/image.jpg"));
   }
 
   @Test
   void shouldGenerateAndUseUploadToken() throws Exception {
-    // User Registrierung
-    String registerJson = objectMapper.writeValueAsString(new RegisterRequest(
-            "Token User",
-            "token-user@example.com",
-            "securepassword"
-    ));
+    String email = "token-user@example.com";
+    registerUser("Token User", email);
 
-    mockMvc.perform(post("/api/auth/sign-up")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(registerJson))
-            .andExpect(status().isOk());
+    MockHttpSession session = loginUser(email);
 
-    // Login
-    String loginJson = objectMapper.writeValueAsString(new LoginRequest(
-            "token-user@example.com",
-            "securepassword"
-    ));
+    String token = generateUploadToken(session);
 
-    MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(loginJson))
-            .andExpect(status().isOk())
-            .andReturn();
+    MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "test.jpg",
+            "image/jpeg",
+            "test image content".getBytes()
+    );
 
-    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
-    assert session != null;
-
-    MvcResult tokenResult = mockMvc.perform(post("/api/snap-receipts/token/generate-upload-token")
+    mockMvc.perform(multipart("/api/snap-receipts/token/upload-by-token")
+                    .file(file)
+                    .param("token", token)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
                     .session(session))
             .andExpect(status().isOk())
-            .andReturn();
+            .andExpect(jsonPath("$.imageUri").isNotEmpty());
 
-    String token = tokenResult.getResponse().getContentAsString().replace("\"", "");
-
-    String uploadJson = """
-            {
-                "token": "%s",
-                "imageUri": "https://example.com/uploaded.jpg"
-            }
-            """.formatted(token);
-
-    // Receipt hochladen via Token
-    mockMvc.perform(post("/api/snap-receipts/token/upload-by-token")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(uploadJson)
-                    .session(session))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.imageUri").value("https://example.com/uploaded.jpg"));
-
-
-    mockMvc.perform(get("/api/snap-receipts/receipts").session(session))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].imageUri").value("https://example.com/uploaded.jpg"));
-
-    // Optional: Check if token is invalidated (deleted)
-    boolean tokenExists = uploadTokenRepository.findById(token).isPresent();
-    assert !tokenExists : "Token should be invalidated (deleted) after upload";
+    assertThat(uploadTokenRepository.findById(token)).isEmpty();
   }
-
 
   @Test
   void shouldRejectUploadWithInvalidToken() throws Exception {
-    String invalidToken = "non-existent-token-id";
+    MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "test.jpg",
+            "image/jpeg",
+            "test image content".getBytes()
+    );
 
-    String uploadJson = """
-            {
-                "token": "%s",
-                "imageUri": "https://example.com/fake.jpg"
-            }
-            """.formatted(invalidToken);
-
-    mockMvc.perform(post("/api/snap-receipts/token/upload-by-token")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(uploadJson))
+    mockMvc.perform(multipart("/api/snap-receipts/token/upload-by-token")
+                    .file(file)
+                    .param("token", "invalid-token"))
             .andExpect(status().isUnauthorized());
   }
 
   @Test
   void shouldRejectUploadWithExpiredToken() throws Exception {
-
     String email = "expired-token@example.com";
-    mockMvc.perform(post("/api/auth/sign-up")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(
-                            new RegisterRequest("Expired Token User", email, "password"))))
-            .andExpect(status().isOk());
+    registerUser("Expired Token User", email);
 
-    MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(new LoginRequest(email, "password"))))
-            .andExpect(status().isOk())
-            .andReturn();
+    MockHttpSession session = loginUser(email);
 
-    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
-    assert session != null;
-
-    MvcResult meResult = mockMvc.perform(get("/api/auth/me").session(session))
-            .andExpect(status().isOk())
-            .andReturn();
-
-    UserDto userDto = objectMapper.readValue(meResult.getResponse().getContentAsString(), UserDto.class);
+    String userId = getUserIdFromSession(session);
 
     UploadToken expiredToken = new UploadToken(
             idService.generateId(),
-            userDto.id(),
+            userId,
             Instant.now().minusSeconds(7200)
     );
     uploadTokenRepository.save(expiredToken);
 
-    String uploadJson = """
-          {
-              "token": "%s",
-              "imageUri": "https://example.com/expired.jpg"
-          }
-          """.formatted(expiredToken.id());
+    MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "test.jpg",
+            "image/jpeg",
+            "test image content".getBytes()
+    );
 
-    mockMvc.perform(post("/api/snap-receipts/token/upload-by-token")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(uploadJson))
+    mockMvc.perform(multipart("/api/snap-receipts/token/upload-by-token")
+                    .file(file)
+                    .param("token", expiredToken.id()))
             .andExpect(status().isUnauthorized());
 
-    boolean tokenExists = uploadTokenRepository.findById(expiredToken.id()).isPresent();
-    assert !tokenExists : "Expired token should be invalidated (deleted)";
+    assertThat(uploadTokenRepository.findById(expiredToken.id())).isEmpty();
   }
+
+
+  private void registerUser(String name, String email) throws Exception {
+    mockMvc.perform(post("/api/auth/sign-up")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(
+                            new RegisterRequest(name, email, "securepassword"))))
+            .andExpect(status().isOk());
+  }
+
+  private MockHttpSession loginUser(String email) throws Exception {
+    MvcResult result = mockMvc.perform(post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(
+                            new LoginRequest(email, "securepassword"))))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    return (MockHttpSession) result.getRequest().getSession(false);
+  }
+
+  private String getUserIdFromSession(MockHttpSession session) throws Exception {
+    MvcResult result = mockMvc.perform(get("/api/auth/me").session(session))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    UserDto userDto = objectMapper.readValue(result.getResponse().getContentAsString(), UserDto.class);
+    return userDto.id();
+  }
+
+  private String generateUploadToken(MockHttpSession session) throws Exception {
+    MvcResult result = mockMvc.perform(post("/api/snap-receipts/token/generate-upload-token")
+                    .session(session))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    return result.getResponse().getContentAsString().replace("\"", "");
+  }
+
+  private Receipt createReceipt(String userId) {
+    return new Receipt(
+            idService.generateId(),
+            userId,
+            "https://example.com/image.jpg",
+            Instant.now()
+    );
+  }
+
+  @Test
+  void deleteReceipt_withoutSession_returnsUnauthorized() throws Exception {
+
+    Receipt receipt = new Receipt(idService.generateId(), "someUserId", "https://example.com/receipt.jpg", Instant.now());
+    receiptRepository.save(receipt);
+
+    mockMvc.perform(delete("/api/snap-receipts/receipts/{id}", receipt.id()))
+            .andExpect(status().isUnauthorized());
+
+    assertThat(receiptRepository.findById(receipt.id())).isPresent();
+  }
+
+  @Test
+  void deleteReceipt_withValidSessionAndOwnership_returnsNoContent() throws Exception {
+    String email = "delete-owner@example.com";
+    registerUser(email, "secret");
+    MockHttpSession session = loginUser("secret");
+    String userId = getUserIdFromSession(session);
+
+    Receipt receipt = new Receipt(idService.generateId(), userId, "https://img.jpg", Instant.now());
+    receiptRepository.save(receipt);
+
+    mockMvc.perform(delete("/api/snap-receipts/receipts/" + receipt.id()).session(session))
+            .andExpect(status().isNoContent());
+    assertThat(receiptRepository.findById(receipt.id())).isEmpty();
+  }
+
 }

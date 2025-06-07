@@ -45,7 +45,7 @@ public class AuthController {
     );
     userRepository.save(user);
 
-    UserDto userDto = new UserDto(idService.generateId(), user.nameOfUser(), user.email(), user.receiptIds());
+    UserDto userDto = new UserDto(idService.generateId(), user.getNameOfUser(), user.getEmail(), user.getReceiptIds());
     return ResponseEntity.ok(userDto);
   }
 
@@ -53,18 +53,18 @@ public class AuthController {
   public ResponseEntity<UserDto> login(@RequestBody LoginRequest request, HttpSession session) {
     Optional<User> userOpt = userRepository.findByEmail(request.email());
 
-    if (userOpt.isEmpty() || !passwordEncoder.matches(request.password(), userOpt.get().password())) {
+    if (userOpt.isEmpty() || !passwordEncoder.matches(request.password(), userOpt.get().getPassword())) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     User user = userOpt.get();
-    session.setAttribute("userId", user.id());
+    session.setAttribute("userId", user.getId());
 
     UserDto userDto = new UserDto(
-            user.id(),
-            user.nameOfUser(),
-            user.email(),
-            user.receiptIds()
+            user.getId(),
+            user.getNameOfUser(),
+            user.getEmail(),
+            user.getReceiptIds()
     );
     return ResponseEntity.ok(userDto);
   }
@@ -74,10 +74,10 @@ public class AuthController {
     return sessionService.getLoggedInUser(session)
             .map(user -> {
               UserDto userDto = new UserDto(
-                      user.id(),
-                      user.nameOfUser(),
-                      user.email(),
-                      user.receiptIds()
+                      user.getId(),
+                      user.getNameOfUser(),
+                      user.getEmail(),
+                      user.getReceiptIds()
               );
               return ResponseEntity.ok(userDto);
             })
