@@ -5,6 +5,7 @@ import wlsp.tech.backend.model.receipt.Receipt;
 import wlsp.tech.backend.repository.ReceiptRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReceiptService {
@@ -24,6 +25,10 @@ public class ReceiptService {
 
   public List<Receipt> getReceiptsByUserId(String userId) {
     return receiptRepository.findByUserId(userId);
+  }
+
+  public Optional<Receipt> getReceiptById(String id) {
+    return receiptRepository.findById(id);
   }
 
   public void deleteReceiptById(String receiptId) {

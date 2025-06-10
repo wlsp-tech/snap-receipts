@@ -1,5 +1,6 @@
-import {PropsWithChildren, ReactNode} from "react";
+import {CSSProperties, PropsWithChildren, ReactNode} from "react";
 import {fetchCurrentUser} from "@/features/auth";
+import {ColumnDef} from "@tanstack/react-table";
 
 
 export type Theme = "dark" | "light" | "system"
@@ -81,3 +82,23 @@ export type GridLayoutProps = {
         '2xl'?: number;
     }>
 }
+
+export type TableGenProps<T> = {
+    data: T[];
+    columns: ColumnDef<T>[];
+};
+
+export type DeleteCellProps = {
+    deleteCallback: () => Promise<void> | void;
+};
+
+export type ImageProps = {
+    src: string;
+    alt: string;
+    width?: number;
+    height?: number;
+    className?: string;
+    placeholder?: string;
+    style?: CSSProperties;
+    loading?: "lazy" | "eager";
+};

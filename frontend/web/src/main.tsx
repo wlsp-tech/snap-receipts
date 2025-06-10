@@ -15,7 +15,7 @@ export const router = createRouter({
     routeTree,
     defaultPreload: 'intent',
     context: {
-        auth: undefined!, // placeholder
+        auth: undefined!,
     },
 })
 
@@ -36,8 +36,8 @@ if (!rootElement.innerHTML) {
             <QueryClientProvider client={queryClient}>
                 <AuthProvider>
                     <RouterWithContext />
-                    <ReactQueryDevtools initialIsOpen={false}/>
-                    <Toaster position={"bottom-center"} richColors/>
+                    <ReactQueryDevtools initialIsOpen={false} />
+                    <Toaster position={"bottom-center"} richColors />
                 </AuthProvider>
             </QueryClientProvider>
         </StrictMode>,

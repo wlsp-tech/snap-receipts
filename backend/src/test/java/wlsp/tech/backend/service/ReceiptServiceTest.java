@@ -7,6 +7,7 @@ import wlsp.tech.backend.repository.ReceiptRepository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -73,5 +74,31 @@ class ReceiptServiceTest {
     receiptService.deleteReceiptById(receiptId);
 
     verify(receiptRepository).deleteById(receiptId);
+  }
+
+  @Test
+  void getReceiptById_shouldReturnReceiptIfExists() {
+    String id = "receipt1";
+    Receipt receipt = new Receipt(id, "user123", "https://image.jpg", Instant.now());
+
+    when(receiptRepository.findById(id)).thenReturn(Optional.of(receipt));
+
+    Optional<Receipt> result = receiptService.getReceiptById(id);
+
+    assertTrue(result.isPresent());
+    assertEquals(receipt, result.get());
+    verify(receiptRepository).findById(id);
+  }
+
+  @Test
+  void getReceiptById_shouldReturnEmptyIfNotExists() {
+    String id = "nonexistent";
+
+    when(receiptRepository.findById(id)).thenReturn(Optional.empty());
+
+    Optional<Receipt> result = receiptService.getReceiptById(id);
+
+    assertTrue(result.isEmpty());
+    verify(receiptRepository).findById(id);
   }
 }

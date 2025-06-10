@@ -14,22 +14,20 @@ export default function UploadStatusAnimation({ status }: Props) {
 
         switch (status) {
             case "loading":
-                // Lade-Loop: Frames 0–120 in Endlosschleife
                 animationRef.current.playSegments([0, 120], true);
                 break;
 
             case "success":
-                // Success-Loop: Frames 238–423 in Endlosschleife
-                animationRef.current.playSegments([238, 423], true);
+                animationRef.current.playSegments([238, 423], false);
+                animationRef.current.playSegments([238, 390], false);
                 break;
 
             case "error":
-                // Error-Loop: Frames 657–847 in Endlosschleife
                 animationRef.current.playSegments([657, 847], false);
+                animationRef.current.playSegments([657, 819], false);
                 break;
 
             default:
-                // idle: Animation stoppen
                 animationRef.current.stop();
                 break;
         }
@@ -41,7 +39,7 @@ export default function UploadStatusAnimation({ status }: Props) {
         <Lottie
             lottieRef={animationRef}
             animationData={animationData}
-            loop={true}
+            loop={false}
             autoplay={false}
             style={{ width: 200, height: 200 }}
         />

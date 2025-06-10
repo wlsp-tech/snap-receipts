@@ -21,4 +21,13 @@ public class CloudinaryService {
             ObjectUtils.asMap("resource_type", "auto"));
     return uploadResult.get("secure_url").toString();
   }
+
+  public void deleteFile(String publicId) throws IOException {
+    cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+  }
+
+  public String extractPublicIdFromUri(String imageUri) {
+    String filename = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+    return filename.contains(".") ? filename.substring(0, filename.lastIndexOf(".")) : filename;
+  }
 }

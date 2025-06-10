@@ -5,6 +5,7 @@ import com.cloudinary.Uploader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import wlsp.tech.backend.model.token.UploadToken;
 import wlsp.tech.backend.repository.ReceiptRepository;
 import wlsp.tech.backend.repository.UploadTokenRepository;
 import wlsp.tech.backend.repository.UserRepository;
+import wlsp.tech.backend.service.CloudinaryService;
 import wlsp.tech.backend.service.IdService;
 
 import java.io.IOException;
@@ -33,8 +35,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -53,6 +54,9 @@ class ReceiptControllerTest {
 
   @Autowired
   private UploadTokenRepository uploadTokenRepository;
+
+  @Mock
+  private CloudinaryService cloudinaryService;
 
   @Autowired
   private UserRepository userRepository;
@@ -230,25 +234,35 @@ class ReceiptControllerTest {
     Receipt receipt = new Receipt(idService.generateId(), "someUserId", "https://example.com/receipt.jpg", Instant.now());
     receiptRepository.save(receipt);
 
-    mockMvc.perform(delete("/api/snap-receipts/receipts/{id}", receipt.id()))
+    mockMvc.perform(delete("/api/snap-receipts/{id}", receipt.id()))
             .andExpect(status().isUnauthorized());
 
     assertThat(receiptRepository.findById(receipt.id())).isPresent();
   }
 
   @Test
-  void deleteReceipt_withValidSessionAndOwnership_returnsNoContent() throws Exception {
-    String email = "delete-owner@example.com";
-    registerUser(email, "secret");
-    MockHttpSession session = loginUser("secret");
+  void shouldGetReceiptById_withValidId_returnsReceipt() throws Exception {
+    String email = "get-receipt@example.com";
+    registerUser("Get Receipt User", email);
+    MockHttpSession session = loginUser(email);
     String userId = getUserIdFromSession(session);
 
-    Receipt receipt = new Receipt(idService.generateId(), userId, "https://img.jpg", Instant.now());
+    Receipt receipt = new Receipt(idService.generateId(), userId, "https://example.com/image.jpg", Instant.now());
     receiptRepository.save(receipt);
 
-    mockMvc.perform(delete("/api/snap-receipts/receipts/" + receipt.id()).session(session))
-            .andExpect(status().isNoContent());
-    assertThat(receiptRepository.findById(receipt.id())).isEmpty();
+    mockMvc.perform(get("/api/snap-receipts/{id}", receipt.id()).session(session))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(receipt.id()))
+            .andExpect(jsonPath("$.imageUri").value("https://example.com/image.jpg"));
+  }
+
+  @Test
+  void shouldGetReceiptById_withoutSession_returnsUnauthorized() throws Exception {
+    Receipt receipt = new Receipt(idService.generateId(), "someUserId", "https://example.com/receipt.jpg", Instant.now());
+    receiptRepository.save(receipt);
+
+    mockMvc.perform(get("/api/snap-receipts/{id}", receipt.id()))
+            .andExpect(status().isUnauthorized());
   }
 
 }

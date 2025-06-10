@@ -1,7 +1,7 @@
 import api from "@/api/axios.ts";
-import { ReceiptProps } from "@/types";
+import {ReceiptProps} from "@/types";
 import axios from "axios";
-import { toast } from "sonner";
+import {toast} from "sonner";
 
 const RECEIPT_BASE_URL = "/snap-receipts"
 
@@ -10,7 +10,7 @@ export const getReceipts = async () => {
         const response = await api.get<ReceiptProps[]>(`${RECEIPT_BASE_URL}/receipts`, {
             withCredentials: true,
         });
-        return response.data;
+        return response.data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
             const message = error.response?.data?.error ?? error.message;
@@ -40,4 +40,25 @@ export async function fetchUploadToken() {
         }
         throw error;
     }
+}
+
+export async function deleteReceipt(receiptId: string) {
+    const deletePromise = api.delete(`${RECEIPT_BASE_URL}/${receiptId}`);
+
+    toast.promise(deletePromise, {
+        loading: "Deleting receipt...",
+        success: "Receipt deleted!",
+        error: (error: unknown) => {
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.error ?? error.message;
+                return `Failed to delete receipt: ${message}`;
+            } else if (error instanceof Error) {
+                return `Failed to delete receipt: ${error.message}`;
+            } else {
+                return "Failed to delete receipt: Unknown error";
+            }
+        },
+    });
+
+    return deletePromise;
 }

@@ -27,11 +27,11 @@ const Header = () => {
 
     return (
         <header
-            className="fixed top-0 left-0 h-16 w-full backdrop-blur-xl border-b-accent border-b px-2 lg:px-8 shadow-lg z-50 transition-opacity duration-700"
+            className="fixed top-0 left-0 h-16 w-full backdrop-blur-xl border-b-accent border-b px-2 lg:px-8 shadow-lg z-50 transition-opacity duration-700 dark:bg-[#18181C]"
         >
             <div className="max-w-screen-custom flex justify-between items-center w-full px-2 lg:px-8 h-full">
                 <Navigation currentUser={user} isMounted={mounted} />
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center gap-4">
                     {!user ? (
                         <Link
                             to="/auth/login"

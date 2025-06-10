@@ -57,7 +57,6 @@ public class ReceiptController {
 
     UploadToken token = tokenOpt.get();
 
-    // Token 1 Stunde gültig
     if (token.createdAt().isBefore(Instant.now().minusSeconds(3600))) {
       uploadTokenService.invalidateToken(token.id());
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -86,7 +85,17 @@ public class ReceiptController {
     }
   }
 
-  @DeleteMapping("/receipts/{id}")
+  @GetMapping("{id}")
+  public ResponseEntity<Receipt> getReceiptById(@PathVariable String id, HttpSession session) {
+    return sessionService.getLoggedInUser(session)
+            .map(user -> receiptService.getReceiptById(id)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build())
+            )
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+  }
+
+  @DeleteMapping("{id}")
   public ResponseEntity<Void> deleteReceipt(
           @PathVariable String id,
           HttpSession session
@@ -97,6 +106,23 @@ public class ReceiptController {
               boolean ownsReceipt = userReceipts.stream().anyMatch(r -> r.id().equals(id));
               if (!ownsReceipt) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+              }
+
+              Optional<Receipt> receiptOptional = receiptService.getReceiptById(id);
+              if (receiptOptional.isEmpty()) {
+                return ResponseEntity.notFound().build();
+              }
+
+              Receipt receipt = receiptOptional.get();
+              String imageUri = receipt.imageUri();
+
+              if (imageUri != null && !imageUri.isEmpty()) {
+                try {
+                  String publicId = cloudinaryService.extractPublicIdFromUri(imageUri);
+                  cloudinaryService.deleteFile(publicId);
+                } catch (IOException e) {
+                  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
               }
 
               receiptService.deleteReceiptById(id);

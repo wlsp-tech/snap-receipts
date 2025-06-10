@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import {
-    ActivityIndicator,
     Modal,
     Platform,
     Pressable,
@@ -36,17 +35,17 @@ export default function PhotoSelector({
         }
 
         const result = await ImagePicker.launchCameraAsync({
-            quality: 0.65,
+            quality: 0.5,
             allowsEditing: false,
             base64: false,
-            mediaTypes: ["images", "videos"],
+            mediaTypes: "images",
         });
 
         if (!result.canceled) {
             const asset = result.assets[0];
             setReadyToUploadFile(true);
             setModalVisible(false);
-            onSelect(asset.uri, asset.type || "image/jpeg");
+            onSelect(asset.uri, asset.type || "image/webp");
         }
     };
 
@@ -76,10 +75,16 @@ export default function PhotoSelector({
                     <View style={styles.centeredView}>
                         <View style={styles.modalView}>
                             <Pressable style={styles.button} onPress={openCamera}>
-                                <Text style={styles.text}>Take photo</Text>
+                                <Text style={styles.text}>
+                                    <IconSymbol name={"camera"} color={"white"} />
+                                    Take photo
+                                </Text>
                             </Pressable>
                             <Pressable style={styles.button} onPress={openFilePicker}>
-                                <Text style={styles.text}>Choose from Device</Text>
+                                <Text style={styles.text}>
+                                    <IconSymbol name={"folder"} color={"white"} />
+                                    Choose from Device
+                                </Text>
                             </Pressable>
                             <Pressable
                                 style={[styles.button, styles.destructiveBtn]}
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     destructiveBtn: {
-        backgroundColor: "#E7000B",
+        backgroundColor: "#e7000b",
     },
     btnContainer: {
         alignItems: "center",

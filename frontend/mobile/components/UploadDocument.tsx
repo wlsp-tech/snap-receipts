@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {
     Platform,
     StyleSheet,
@@ -11,8 +11,8 @@ import ImageCompressor from "@/components/ImageCompressor";
 import LottieStatus from "@/components/LottieStatus";
 
 export default function UploadDocument({
-                                           token,
-                                       }: {
+   token,
+}: {
     token: string | string[];
 }) {
     const [fileUri, setFileUri] = useState<string | null>(null);
@@ -39,12 +39,12 @@ export default function UploadDocument({
             if (Platform.OS === "web") {
                 const response = await fetch(compressedUri);
                 const blob = await response.blob();
-                formData.append("file", blob, "upload.jpg");
+                formData.append("file", blob, "upload.png");
             } else {
                 formData.append("file", {
                     uri: compressedUri,
-                    name: "upload.jpg",
-                    type: "image/jpeg",
+                    name: "upload.png",
+                    type: "image/png",
                 } as any);
             }
 

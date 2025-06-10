@@ -5,7 +5,7 @@ const  QRCodeComp = ({ token } : {token?: string}) => {
     return (
         <div>
             <h1>{token}</h1>
-            <QRCodeSVG value={url} size={300} />
+            <QRCodeSVG value={url} size={200} />
         </div>
     )
 }
