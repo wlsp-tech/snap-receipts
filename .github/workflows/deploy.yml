@@ -1,4 +1,4 @@
-name: Neue Fische WMS Deployment
+name: Snap-Receipts Deployment
 on:
   push:
     branches:
