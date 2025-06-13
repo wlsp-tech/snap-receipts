@@ -6,6 +6,7 @@ import wlsp.tech.backend.model.receipt.Receipt;
 import wlsp.tech.backend.repository.ReceiptRepository;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,19 +53,36 @@ class ReceiptServiceTest {
   }
 
   @Test
-  void getReceiptsByUserId_shouldReturnUserReceipts() {
+  void getReceiptsByIdsAndUserId_shouldReturnMatchingReceipts() {
     String userId = "user123";
-    List<Receipt> userReceipts = List.of(
-            new Receipt("1", userId, "uri1", Instant.now())
+    List<String> receiptIds = List.of("1", "2");
+    List<Receipt> expectedReceipts = List.of(
+            new Receipt("1", userId, "uri1", Instant.now()),
+            new Receipt("2", userId, "uri2", Instant.now())
     );
 
-    when(receiptRepository.findByUserId(userId)).thenReturn(userReceipts);
+    when(receiptRepository.findByIdInAndUserId(receiptIds, userId)).thenReturn(expectedReceipts);
 
-    List<Receipt> result = receiptService.getReceiptsByUserId(userId);
+    List<Receipt> result = receiptService.getReceiptsByIdsAndUserId(receiptIds, userId);
 
-    assertEquals(1, result.size());
-    assertEquals(userId, result.getFirst().userId());
-    verify(receiptRepository).findByUserId(userId);
+    assertEquals(expectedReceipts, result);
+    verify(receiptRepository).findByIdInAndUserId(receiptIds, userId);
+  }
+
+  @Test
+  void getReceiptsByIdsAndUserId_shouldReturnEmptyListWhenIdsNull() {
+    List<Receipt> result = receiptService.getReceiptsByIdsAndUserId(null, "user123");
+
+    assertTrue(result.isEmpty());
+    verify(receiptRepository, never()).findByIdInAndUserId(anyList(), anyString());
+  }
+
+  @Test
+  void getReceiptsByIdsAndUserId_shouldReturnEmptyListWhenIdsEmpty() {
+    List<Receipt> result = receiptService.getReceiptsByIdsAndUserId(Collections.emptyList(), "user123");
+
+    assertTrue(result.isEmpty());
+    verify(receiptRepository, never()).findByIdInAndUserId(anyList(), anyString());
   }
 
   @Test

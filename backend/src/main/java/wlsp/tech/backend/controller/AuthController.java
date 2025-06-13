@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import wlsp.tech.backend.model.dto.*;
+import wlsp.tech.backend.model.token.UploadToken;
 import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 import wlsp.tech.backend.service.IdService;
 import wlsp.tech.backend.service.SessionService;
+import wlsp.tech.backend.service.UploadTokenService;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,7 @@ public class AuthController {
   private final UserRepository userRepository;
   private final SessionService sessionService;
   private final PasswordEncoder passwordEncoder;
+  private final UploadTokenService uploadTokenService;
   private final IdService idService;
 
   @PostMapping("/sign-up")
@@ -97,4 +100,33 @@ public class AuthController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
+
+  @PostMapping("/token-login")
+  public ResponseEntity<UserDto> loginWithToken(@RequestBody TokenLoginReq request, HttpSession session) {
+    Optional<UploadToken> uploadTokenOpt = uploadTokenService.validateToken(request.token());
+
+    if (uploadTokenOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    UploadToken uploadToken = uploadTokenOpt.get();
+    Optional<User> userOpt = userRepository.findById(uploadToken.userId());
+
+    if (userOpt.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    User user = userOpt.get();
+    session.setAttribute("userId", user.getId());
+
+    UserDto userDto = new UserDto(
+            user.getId(),
+            user.getNameOfUser(),
+            user.getEmail(),
+            user.getReceiptIds()
+    );
+
+    return ResponseEntity.ok(userDto);
+  }
+
 }

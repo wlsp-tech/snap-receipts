@@ -31,7 +31,10 @@ public class ReceiptController {
   @GetMapping("/receipts")
   public ResponseEntity<List<Receipt>> getReceipts(HttpSession session) {
     return sessionService.getLoggedInUser(session)
-            .map(user -> ResponseEntity.ok(receiptService.getReceiptsByUserId(user.getId())))
+            .map(user -> {
+              List<Receipt> receipts = receiptService.getReceiptsByIdsAndUserId(user.getReceiptIds(), user.getId());
+              return ResponseEntity.ok(receipts);
+            })
             .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }
 
@@ -102,9 +105,7 @@ public class ReceiptController {
   ) {
     return sessionService.getLoggedInUser(session)
             .<ResponseEntity<Void>>map(user -> {
-              List<Receipt> userReceipts = receiptService.getReceiptsByUserId(user.getId());
-              boolean ownsReceipt = userReceipts.stream().anyMatch(r -> r.id().equals(id));
-              if (!ownsReceipt) {
+              if (!user.getReceiptIds().contains(id)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
               }
 

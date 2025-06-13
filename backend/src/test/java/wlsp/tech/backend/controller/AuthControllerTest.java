@@ -152,4 +152,56 @@ class AuthControllerTest {
     mockMvc.perform(get("/api/auth/logout").session(session))
             .andExpect(status().isOk());
   }
+
+  @Test
+  void tokenLogin_withValidToken_returnsUserDtoAndSession() throws Exception {
+    RegisterRequest register = new RegisterRequest("Frank", "frank@example.com", "pw123");
+    mockMvc.perform(post("/api/auth/sign-up")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(register)))
+            .andExpect(status().isOk());
+
+    MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(new LoginRequest("frank@example.com", "pw123"))))
+            .andReturn();
+
+    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+
+    assert session != null;
+    MvcResult tokenResult = mockMvc.perform(post("/api/snap-receipts/token/generate-upload-token")
+                    .session(session))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    String token = tokenResult.getResponse().getContentAsString();
+
+    String tokenLoginJson = """
+        {
+          "token": "%s"
+        }
+        """.formatted(token);
+
+    mockMvc.perform(post("/api/auth/token-login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(tokenLoginJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.email").value("frank@example.com"))
+            .andExpect(jsonPath("$.nameOfUser").value("Frank"));
+  }
+
+  @Test
+  void tokenLogin_withInvalidToken_returnsUnauthorized() throws Exception {
+    String tokenLoginJson = """
+        {
+          "token": "nonexistent-token"
+        }
+        """;
+
+    mockMvc.perform(post("/api/auth/token-login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(tokenLoginJson))
+            .andExpect(status().isUnauthorized());
+  }
+
 }

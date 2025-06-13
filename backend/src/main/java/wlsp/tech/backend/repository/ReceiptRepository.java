@@ -6,5 +6,5 @@ import wlsp.tech.backend.model.receipt.Receipt;
 import java.util.List;
 
 public interface ReceiptRepository extends MongoRepository<Receipt, String> {
-  List<Receipt> findByUserId(String userId);
+  List<Receipt> findByIdInAndUserId(List<String> ids, String userId);
 }

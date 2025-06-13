@@ -1,0 +1,1 @@
+import{c as o,j as e,L as t}from"./index-Doy2HO_h.js";import{A as s,F as a}from"./form-wrapper-DtV8dDP8.js";const c=o("/auth/login")({component:r});function r(){return e.jsx(s,{className:"flex items-center",children:e.jsx(a,{mode:"login",className:"flex flex-1 items-center",headerLabel:"Welcome Back - to the Snap side of the Receipts!",children:e.jsx(t,{})})})}export{c as Route};
