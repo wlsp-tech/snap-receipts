@@ -68,6 +68,10 @@ export interface ReceiptProps {
     uuid: string;
     imageUri: string;
     createdAt: string
+    company: string;
+    amount: string;
+    date: string;
+    category: string;
     hasFilterBtn?: boolean
 }
 

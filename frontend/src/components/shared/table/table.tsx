@@ -51,8 +51,8 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
     return (
         <div className="w-full text-foreground">
             <div className="overflow-x-auto sm:overflow-visible">
-                <div className="min-w-[450px] w-fit mx-auto">
-                    <table className="w-full">
+                <div className="min-w-4xl w-fit mx-auto">
+                    <table className="w-full table-fixed">
                         <thead className="text-left [&_tr]:border-b">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr key={headerGroup.id}>
@@ -61,13 +61,12 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                                         key={header.id}
                                         colSpan={header.colSpan}
                                         className={cn(
-                                            "p-4",
-                                            header.id === "actions" && "w-28 text-right",
-                                            header.id === "receiptImg" && "w-6/12",
-                                            header.id === "createdAt" && "min-w-40"
+                                            "p-4 w-[14%]",
+                                            header.id === "receiptImg" && "w-[30%]",
+                                            header.id === "actions" && "text-right"
                                         )}
                                     >
-                                        {header.id === "createdAt" ? (
+                                        {header.id !== "actions" && header.column.id !== "receiptImg"  ? (
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -85,9 +84,7 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                                                 {{
                                                     asc: <ArrowUp />,
                                                     desc: <ArrowDown />,
-                                                }[
-                                                    header.column.getIsSorted() as string
-                                                    ] ?? null}
+                                                }[header.column.getIsSorted() as string] ?? null}
                                             </Button>
                                         ) : (
                                             flexRender(
@@ -110,13 +107,17 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                             </tr>
                         ) : (
                             table.getRowModel().rows.map((row) => (
-                                <tr key={row.id} className={"border-b transition-colors hover:bg-muted/50"}>
+                                <tr
+                                    key={row.id}
+                                    className={"border-b transition-colors hover:bg-muted/50"}
+                                >
                                     {row.getVisibleCells().map((cell) => (
                                         <td
                                             key={cell.id}
                                             className={cn(
-                                                "p-4",
-                                                cell.id.endsWith("_actions") && "text-right"
+                                                "p-4 w-[14%]",
+                                                cell.column.id === "receiptImg" && "w-[30%]",
+                                                cell.column.id === "actions" && "text-right"
                                             )}
                                         >
                                             {flexRender(
@@ -130,6 +131,7 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                         )}
                         </tbody>
                     </table>
+
                 </div>
             </div>
 

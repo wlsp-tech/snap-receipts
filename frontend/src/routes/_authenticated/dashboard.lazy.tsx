@@ -4,10 +4,10 @@ import {deleteReceipt, fetchUploadToken, getReceipts} from "@/features/receipt/s
 import {ReceiptProps} from "@/types";
 import {toast} from "sonner";
 import {useQuery} from '@tanstack/react-query';
-import {dateFormater} from "@/lib/utils";
 import {ColumnDef} from "@tanstack/react-table";
 import {queryClient} from "@/lib/queryClient";
 import {Button, DropzoneModal, Image, LayoutContainer, Table, DeleteCell, QRCodeComp} from "@/components";
+import {dateFormater} from "@/lib/utils.ts";
 
 const Dashboard = () => {
     const [token, setToken] = useState<string>();
@@ -52,32 +52,50 @@ const Dashboard = () => {
                 id: "receiptImg",
                 header: () => "Receipt",
                 cell: ({row}) => {
-                    const {id, imageUri} = row.original;
+                    const {id, imageUri, company} = row.original;
                     return (
                         <div className="grid grid-cols-[auto_1fr] items-center gap-2">
                             <div className="w-24">
                                 <Image src={imageUri} alt={`Receipt-${id}`}/>
                             </div>
-                            <div>
-                                <p>{}</p>
-                                <p className="truncate" title={`Receipt id: ${id}`}>Receipt id: {id}</p>
+                            <div className="p-2">
+                                <p>
+                                    <span className="font-semibold">Company: </span>
+                                    {company}
+                                </p>
                             </div>
                         </div>
                     )
                 }
             },
             {
-                accessorFn: row => row.createdAt,
-                id: "createdAt",
+                accessorFn: row => row.date,
+                id: "date",
                 cell: ({row}) => {
-                    const {createdAt} = row.original;
-                    return (
-                        <>
-                            {dateFormater(createdAt)}
-                        </>
-                    )
+                    const {date} = row.original;
+                    return <>{dateFormater(date)}</>
                 },
-                header: () => <span>Created at</span>,
+                header: () => <>Date</>,
+                footer: r => r.column.id,
+            },
+            {
+                accessorFn: row => row.amount,
+                id: "amount",
+                cell: ({row}) => {
+                    const {amount} = row.original;
+                    return <>{amount}</>
+                },
+                header: () => <>Amount</>,
+                footer: r => r.column.id,
+            },
+            {
+                accessorFn: row => row.category,
+                id: "category",
+                cell: ({row}) => {
+                    const {category} = row.original;
+                    return <>{category}</>
+                },
+                header: () => <>Category</>,
                 footer: r => r.column.id,
             },
             {
