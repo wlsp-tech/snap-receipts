@@ -1,40 +1,39 @@
-import {FC, useState} from "react";
-import {ImageProps} from "@/types";
-import {cn} from "@/lib/utils.ts";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
-const Image: FC<ImageProps> = ({
-     src,
-     alt,
-     className,
-     placeholder,
-     loading = "lazy",
- }) => {
+interface SmartImageProps {
+    src: string;
+    alt?: string;
+    className?: string;
+}
+
+export default function SmartImage({ src, alt = "", className = "" }: SmartImageProps) {
     const [loaded, setLoaded] = useState(false);
 
     return (
-        <div className={cn("relative w-full h-full overflow-hidden rounded-lg", className)}>
-            {placeholder && !loaded && (
-                <img
-                    src={placeholder}
-                    alt="placeholder"
-                    className="absolute inset-0 w-full h-full object-cover blur-lg"
-                    width={"100%"}
-                    height={"100%"}
-
-                />
+        <div
+            className={cn(
+                "relative w-full max-w-sm aspect-[210/297] rounded-xl overflow-hidden shadow-md",
+                className
             )}
+        >
+            {!loaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="animate-spin w-6 h-6 text-gray-400" />
+                </div>
+            )}
+
             <img
                 src={src}
                 alt={alt}
-                loading={loading}
+                loading="lazy"
                 onLoad={() => setLoaded(true)}
-                className={cn("w-full h-full transition-opacity opacity-0 duration-200",
-                    loaded && "opacity-100")}
-                width={"100%"}
-                height={"100%"}
+                className={cn(
+                    "absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300",
+                    loaded ? "opacity-100" : "opacity-0"
+                )}
             />
         </div>
     );
-};
-
-export default Image;
+}

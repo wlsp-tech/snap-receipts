@@ -1,5 +1,5 @@
 import {createLazyFileRoute} from '@tanstack/react-router'
-import {FormWrapper} from "@/features/auth/components/form-wrapper.tsx";
+import {FormWrapper} from "@/features/auth/components/form-wrapper";
 import {SignUpForm} from "@/features/auth";
 import {AuthLayout} from "@/layouts";
 

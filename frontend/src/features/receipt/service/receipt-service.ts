@@ -44,8 +44,12 @@ export async function fetchUploadToken() {
 
 export async function uploadReceipt(
     compressedUri: string,
-    token: string
-): Promise<void> {
+    token: string,
+    company: string,
+    amount: string,
+    date: string,
+    category: string,
+) {
     if (!compressedUri || !token) throw new Error("Missing image or token");
 
     try {
@@ -55,6 +59,10 @@ export async function uploadReceipt(
         const formData = new FormData();
         formData.append("file", blob, "upload.png");
         formData.append("token", token);
+        formData.append("company", company);
+        formData.append("amount", amount);
+        formData.append("date", date);
+        formData.append("category", category);
 
         await api.post(`${RECEIPT_BASE_URL}/token/upload-by-token`, formData, {
             headers: {
@@ -63,15 +71,8 @@ export async function uploadReceipt(
             },
             withCredentials: true,
         });
-    } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-            const message = error.response?.data?.error ?? error.message;
-            toast.error(`Upload failed: ${message}`);
-        } else if (error instanceof Error) {
-            toast.error(`Upload failed: ${error.message}`);
-        } else {
-            toast.error("Upload failed: Unknown error");
-        }
+    } catch (error) {
+        toast.error("Upload failed: Unknown error");
         throw error;
     }
 }

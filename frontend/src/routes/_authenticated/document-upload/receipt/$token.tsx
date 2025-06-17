@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { createFileRoute, useParams } from '@tanstack/react-router';
+import {useEffect, useState} from "react";
+import {createFileRoute, useParams} from '@tanstack/react-router';
 import LayoutContainer from "@/components/shared/layout-container";
 import UploadDocument from "@/components/upload-document";
-import { queryClient } from "@/lib/queryClient";
-import { loginWithToken } from "@/features/auth/service/auth-service";
-import { LoaderCircle } from "lucide-react";
+import {queryClient} from "@/lib/queryClient";
+import {loginWithToken} from "@/features/auth/service/auth-service";
+import UploadStatusAnimation from "@/components/lottie-status.tsx";
+import {StatusType} from "@/types";
 
 export const Route = createFileRoute(
     '/_authenticated/document-upload/receipt/$token'
@@ -43,13 +44,12 @@ function RouteComponent() {
         )();
     }, [token]);
 
-    if (loading) return <LayoutContainer><LoaderCircle className="animate-spin" /></LayoutContainer>;
-    if (error) return <LayoutContainer>Error: {error}</LayoutContainer>;
-    if (!isLoggedIn) return <LayoutContainer>Pls login!</LayoutContainer>;
-
     return (
-        <LayoutContainer className="flex justify-items-center items-center gap-2 flex-col">
-            <UploadDocument token={token} />
+        <LayoutContainer className="flex flex-1 justify-items-center items-center gap-2 flex-col">
+            {token && isLoggedIn && !loading && !error && <UploadDocument tokenPage={true} token={token} />}
+            {loading && <UploadStatusAnimation status={StatusType.LOADING} />}
+            {error && <p>Error: {error}</p>}
+            {!isLoggedIn && <p>You are not logged in.</p>}
         </LayoutContainer>
     );
 }

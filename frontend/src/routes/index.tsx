@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import LayoutContainer from "@/components/shared/layout-container.tsx";
+import { LayoutContainer } from "@/components";
 
 const Root = () => {
     return (

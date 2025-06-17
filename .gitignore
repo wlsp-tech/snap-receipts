@@ -36,3 +36,4 @@ build/
 /backend/mvnw
 /backend/.mvn/
 
+/.env.local

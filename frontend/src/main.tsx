@@ -8,8 +8,8 @@ import {queryClient} from "@/lib/queryClient.ts";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import {Toaster} from "sonner";
 import {useAuth} from "@/features/auth/hooks";
-import {AuthProvider} from "@/providers/auth-provider.tsx";
-import {RouterWithContext} from "@/router-with-context.tsx";
+import {AuthProvider} from "@/providers/auth-provider";
+import {RouterWithContext} from "@/router-with-context";
 
 export const router = createRouter({
     routeTree,

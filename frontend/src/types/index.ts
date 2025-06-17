@@ -1,6 +1,7 @@
 import {PropsWithChildren, ReactNode} from "react";
 import {fetchCurrentUser} from "@/features/auth";
 import {ColumnDef} from "@tanstack/react-table";
+import * as React from "react";
 
 
 export type Theme = "dark" | "light" | "system"
@@ -108,6 +109,24 @@ export type ImageCompressorProps = {
     setReadyToUploadFile: (b: boolean) => void;
 };
 
+export interface OCRResult {
+    date: string;
+    amount: string;
+    company: string;
+    category: string;
+}
+
+export interface DocumentSelectorProps {
+    fileUri: string | null;
+    setFileUri: (uri: string | null) => void;
+    onSelect: (uri: string, mimeType: string) => void;
+    onCancel?: () => void;
+    readyToUploadFile: boolean;
+    setReadyToUploadFile: (ready: boolean) => void;
+    handleUploadCallback: () => void;
+    formValues: OCRResult;
+    setFormValues: React.Dispatch<React.SetStateAction<OCRResult>>;
+}
 
 export type uploadStatusProps = {
     status: StatusType
@@ -118,4 +137,12 @@ export enum StatusType {
     LOADING = "loading",
     SUCCESS = "success",
     ERROR = "error"
+}
+
+export interface UploadDocumentProps {
+    token: string | string[]
+    uriFile?: File
+    onUploadSuccess?: () => void
+    onCancel?: () => void
+    tokenPage?: boolean
 }

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import FilePreview from "@/components/file-preview";
+import {FilePreview} from "@/components";
 import {ImageCompressorProps} from "@/types";
 
 export default function ImageCompressor({

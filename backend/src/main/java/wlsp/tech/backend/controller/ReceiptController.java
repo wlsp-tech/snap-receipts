@@ -2,6 +2,7 @@ package wlsp.tech.backend.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,9 @@ import wlsp.tech.backend.model.token.UploadToken;
 import wlsp.tech.backend.service.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +54,11 @@ public class ReceiptController {
   @PostMapping(value = "/token/upload-by-token", consumes = {"multipart/form-data"})
   public ResponseEntity<Receipt> uploadViaToken(
           @RequestPart("file") MultipartFile file,
-          @RequestParam("token") String tokenId
+          @RequestParam("token") String tokenId,
+          @RequestParam("company") String company,
+          @RequestParam("amount") BigDecimal amount,
+          @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+          @RequestParam("category") String categroy
   ) {
     Optional<UploadToken> tokenOpt = uploadTokenService.validateToken(tokenId);
     if (tokenOpt.isEmpty()) {
@@ -72,7 +79,11 @@ public class ReceiptController {
               idService.generateId(),
               token.userId(),
               cloudinaryUrl,
-              Instant.now()
+              Instant.now(),
+              company,
+              amount,
+              date,
+              categroy
       );
 
       Receipt saved = receiptService.saveReceipt(receipt);
@@ -87,6 +98,7 @@ public class ReceiptController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
+
 
   @GetMapping("{id}")
   public ResponseEntity<Receipt> getReceiptById(@PathVariable String id, HttpSession session) {

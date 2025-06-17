@@ -1,18 +1,13 @@
 import {createLazyFileRoute, useNavigate} from '@tanstack/react-router'
-import LayoutContainer from "@/components/shared/layout-container";
-import QRCodeComp from "@/components/ui/qrcode";
 import {useMemo, useState} from "react";
 import {deleteReceipt, fetchUploadToken, getReceipts} from "@/features/receipt/service/receipt-service";
 import {ReceiptProps} from "@/types";
 import {toast} from "sonner";
-import {Button} from "@/components/ui/button";
 import {useQuery} from '@tanstack/react-query';
 import {dateFormater} from "@/lib/utils";
 import {ColumnDef} from "@tanstack/react-table";
-import Table from "@/components/shared/table/table";
-import Image from "@/components/ui/image";
-import DeleteCell from "@/components/shared/table/delete-cell";
 import {queryClient} from "@/lib/queryClient";
+import {Button, DropzoneModal, Image, LayoutContainer, Table, DeleteCell, QRCodeComp} from "@/components";
 
 const Dashboard = () => {
     const [token, setToken] = useState<string>();
@@ -37,7 +32,7 @@ const Dashboard = () => {
         }
     }
 
-    const {data, isLoading, isError} = useQuery<ReceiptProps[]>({
+    const {data, isLoading, isError, refetch: refetchReceipts} = useQuery<ReceiptProps[]>({
         queryKey: ['receipts'],
         queryFn: getReceipts,
         staleTime: 1000 * 60 * 30,
@@ -51,7 +46,6 @@ const Dashboard = () => {
             if (e instanceof Error) toast.error("Could not delete Receipt! Try again.")
         }
     }
-
     const columns = useMemo<ColumnDef<ReceiptProps>[]>(
         () => [
             {
@@ -64,7 +58,10 @@ const Dashboard = () => {
                             <div className="w-24">
                                 <Image src={imageUri} alt={`Receipt-${id}`}/>
                             </div>
-                            <span className="truncate" title={`Receipt id: ${id}`}>Receipt id: {id}</span>
+                            <div>
+                                <p>{}</p>
+                                <p className="truncate" title={`Receipt id: ${id}`}>Receipt id: {id}</p>
+                            </div>
                         </div>
                     )
                 }
@@ -99,13 +96,13 @@ const Dashboard = () => {
                 <h3 className="text-xl font-semibold">Receipt Manager</h3>
                 <Button
                     onClick={handleNewReceipt}
-                    disabled={token !== undefined}>
-                    New Receipt
+                    disabled={!!token}
+                >
+                    +add receipt
                 </Button>
             </div>
 
-            <div
-                className="border rounded-xl p-6 flex flex-col items-center justify-center min-h-96 bg-muted text-muted-foreground">
+            <div className="border rounded-xl p-6 flex flex-col items-center justify-center min-h-96 bg-muted text-muted-foreground">
                 {!token && data && data.length <= 0 && (
                     <>
                         <div
@@ -139,10 +136,23 @@ const Dashboard = () => {
                 )}
 
                 {token && !isMobile && (
-                    <>
-                        <QRCodeComp token={token}/>
-                        {data && data.length <= 0 && <p className="mt-4 text-sm font-semibold">You are about to change that!</p>}
-                    </>
+                    <div className="flex w-full mb-18">
+                        <div className="w-1/2 mx-auto grid grid-cols-[1fr_1fr] gap-10 h-full text-sm">
+                            <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4 text-center">
+                                <QRCodeComp token={token} />
+                                <p className="px-8 text-foreground">Snap the receipt with your Smartphone</p>
+                            </div>
+                            <div>
+                                <DropzoneModal
+                                    token={token}
+                                    onUploadSuccess={() => {
+                                        refetchReceipts();
+                                        setToken(undefined);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {!isError && data && data.length > 0 && (

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react"
-import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { Navigation } from "@/components/layout"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { LucideLogIn } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/features/auth/hooks"
 import { UserAvatarAction } from "@/features/user"
+import {Navigation, ThemeToggle} from "@/components";
 
 const Header = () => {
     const { user, logout } = useAuth()

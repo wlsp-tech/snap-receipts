@@ -10,113 +10,152 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedDocumentUploadReceiptTokenRouteImport } from './routes/_authenticated/document-upload/receipt/$token'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as AuthenticatedImport } from './routes/_authenticated'
-import { Route as IndexImport } from './routes/index'
-import { Route as AuthenticatedDocumentUploadReceiptTokenImport } from './routes/_authenticated/document-upload/receipt/$token'
-
-// Create Virtual Routes
-
-const AuthSignUpLazyImport = createFileRoute('/auth/sign-up')()
-const AuthLoginLazyImport = createFileRoute('/auth/login')()
-const AuthenticatedDashboardLazyImport = createFileRoute(
+const AuthSignUpLazyRouteImport = createFileRoute('/auth/sign-up')()
+const AuthLoginLazyRouteImport = createFileRoute('/auth/login')()
+const AuthenticatedDashboardLazyRouteImport = createFileRoute(
   '/_authenticated/dashboard',
 )()
 
-// Create/Update Routes
-
-const AuthenticatedRoute = AuthenticatedImport.update({
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthSignUpLazyRoute = AuthSignUpLazyImport.update({
+const AuthSignUpLazyRoute = AuthSignUpLazyRouteImport.update({
   id: '/auth/sign-up',
   path: '/auth/sign-up',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/auth/sign-up.lazy').then((d) => d.Route))
-
-const AuthLoginLazyRoute = AuthLoginLazyImport.update({
+const AuthLoginLazyRoute = AuthLoginLazyRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/auth/login.lazy').then((d) => d.Route))
-
-const AuthenticatedDashboardLazyRoute = AuthenticatedDashboardLazyImport.update(
-  {
+const AuthenticatedDashboardLazyRoute =
+  AuthenticatedDashboardLazyRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => AuthenticatedRoute,
-  } as any,
-).lazy(() =>
-  import('./routes/_authenticated/dashboard.lazy').then((d) => d.Route),
-)
-
+  } as any).lazy(() =>
+    import('./routes/_authenticated/dashboard.lazy').then((d) => d.Route),
+  )
 const AuthenticatedDocumentUploadReceiptTokenRoute =
-  AuthenticatedDocumentUploadReceiptTokenImport.update({
+  AuthenticatedDocumentUploadReceiptTokenRouteImport.update({
     id: '/document-upload/receipt/$token',
     path: '/document-upload/receipt/$token',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/dashboard': typeof AuthenticatedDashboardLazyRoute
+  '/auth/login': typeof AuthLoginLazyRoute
+  '/auth/sign-up': typeof AuthSignUpLazyRoute
+  '/document-upload/receipt/$token': typeof AuthenticatedDocumentUploadReceiptTokenRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/dashboard': typeof AuthenticatedDashboardLazyRoute
+  '/auth/login': typeof AuthLoginLazyRoute
+  '/auth/sign-up': typeof AuthSignUpLazyRoute
+  '/document-upload/receipt/$token': typeof AuthenticatedDocumentUploadReceiptTokenRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardLazyRoute
+  '/auth/login': typeof AuthLoginLazyRoute
+  '/auth/sign-up': typeof AuthSignUpLazyRoute
+  '/_authenticated/document-upload/receipt/$token': typeof AuthenticatedDocumentUploadReceiptTokenRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/auth/login'
+    | '/auth/sign-up'
+    | '/document-upload/receipt/$token'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/dashboard'
+    | '/auth/login'
+    | '/auth/sign-up'
+    | '/document-upload/receipt/$token'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/_authenticated/dashboard'
+    | '/auth/login'
+    | '/auth/sign-up'
+    | '/_authenticated/document-upload/receipt/$token'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthLoginLazyRoute: typeof AuthLoginLazyRoute
+  AuthSignUpLazyRoute: typeof AuthSignUpLazyRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthenticatedImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardLazyImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginLazyImport
-      parentRoute: typeof rootRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/sign-up': {
       id: '/auth/sign-up'
       path: '/auth/sign-up'
       fullPath: '/auth/sign-up'
-      preLoaderRoute: typeof AuthSignUpLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthSignUpLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardLazyRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/document-upload/receipt/$token': {
       id: '/_authenticated/document-upload/receipt/$token'
       path: '/document-upload/receipt/$token'
       fullPath: '/document-upload/receipt/$token'
-      preLoaderRoute: typeof AuthenticatedDocumentUploadReceiptTokenImport
-      parentRoute: typeof AuthenticatedImport
+      preLoaderRoute: typeof AuthenticatedDocumentUploadReceiptTokenRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
-
-// Create and export the route tree
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardLazyRoute: typeof AuthenticatedDashboardLazyRoute
@@ -133,116 +172,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '': typeof AuthenticatedRouteWithChildren
-  '/dashboard': typeof AuthenticatedDashboardLazyRoute
-  '/auth/login': typeof AuthLoginLazyRoute
-  '/auth/sign-up': typeof AuthSignUpLazyRoute
-  '/document-upload/receipt/$token': typeof AuthenticatedDocumentUploadReceiptTokenRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '': typeof AuthenticatedRouteWithChildren
-  '/dashboard': typeof AuthenticatedDashboardLazyRoute
-  '/auth/login': typeof AuthLoginLazyRoute
-  '/auth/sign-up': typeof AuthSignUpLazyRoute
-  '/document-upload/receipt/$token': typeof AuthenticatedDocumentUploadReceiptTokenRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardLazyRoute
-  '/auth/login': typeof AuthLoginLazyRoute
-  '/auth/sign-up': typeof AuthSignUpLazyRoute
-  '/_authenticated/document-upload/receipt/$token': typeof AuthenticatedDocumentUploadReceiptTokenRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | ''
-    | '/dashboard'
-    | '/auth/login'
-    | '/auth/sign-up'
-    | '/document-upload/receipt/$token'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | ''
-    | '/dashboard'
-    | '/auth/login'
-    | '/auth/sign-up'
-    | '/document-upload/receipt/$token'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/_authenticated/dashboard'
-    | '/auth/login'
-    | '/auth/sign-up'
-    | '/_authenticated/document-upload/receipt/$token'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  AuthLoginLazyRoute: typeof AuthLoginLazyRoute
-  AuthSignUpLazyRoute: typeof AuthSignUpLazyRoute
-}
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthLoginLazyRoute: AuthLoginLazyRoute,
   AuthSignUpLazyRoute: AuthSignUpLazyRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/_authenticated",
-        "/auth/login",
-        "/auth/sign-up"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/_authenticated": {
-      "filePath": "_authenticated.tsx",
-      "children": [
-        "/_authenticated/dashboard",
-        "/_authenticated/document-upload/receipt/$token"
-      ]
-    },
-    "/_authenticated/dashboard": {
-      "filePath": "_authenticated/dashboard.lazy.tsx",
-      "parent": "/_authenticated"
-    },
-    "/auth/login": {
-      "filePath": "auth/login.lazy.tsx"
-    },
-    "/auth/sign-up": {
-      "filePath": "auth/sign-up.lazy.tsx"
-    },
-    "/_authenticated/document-upload/receipt/$token": {
-      "filePath": "_authenticated/document-upload/receipt/$token.tsx",
-      "parent": "/_authenticated"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

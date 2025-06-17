@@ -8,14 +8,11 @@ import { UserDto } from "@/types";
 export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     const [user, setUser] = useState<UserDto | null>(null);
     const [loading, setLoading] = useState(true);
+    const pathNames = ["/", "/auth/login", "/auth/sign-up"];
 
     useEffect(() => {
 
-        if (location.pathname === "/auth/login" || location.pathname === "/") {
-            setUser(null);
-            setLoading(false);
-            return;
-        }
+        if (pathNames.includes(location.pathname)) { return }
 
         const cached = queryClient.getQueryData<UserDto>(['currentUser']);
         if (cached) {

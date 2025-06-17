@@ -100,7 +100,7 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                             </tr>
                         ))}
                         </thead>
-                        <tbody>
+                        <tbody className="text-sm">
                         {isLoading ? (
                             <tr className="h-2">
                                 <td
