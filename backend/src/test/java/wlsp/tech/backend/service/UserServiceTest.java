@@ -66,7 +66,6 @@ class UserServiceTest {
 
   @Test
   void removeReceiptFromUser_shouldRemoveReceiptIdAndSaveUpdatedUser() {
-
     String userId = "user123";
     String receiptIdToRemove = "receipt456";
     User existingUser = new User(
@@ -84,7 +83,23 @@ class UserServiceTest {
 
     assertFalse(existingUser.getReceiptIds().contains(receiptIdToRemove));
     assertThat(existingUser.getReceiptIds()).containsExactlyInAnyOrder("receipt123", "receipt789");
+
     verify(userRepository).findById(userId);
     verify(userRepository).save(existingUser);
   }
+
+  @Test
+  void removeReceiptFromUser_whenUserNotFound_shouldThrowException() {
+    String userId = "nonexistentUser";
+    String receiptId = "receiptToRemove";
+
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    assertThrows(RuntimeException.class, () -> userService.removeReceiptFromUser(userId, receiptId));
+
+    verify(userRepository).findById(userId);
+    verify(userRepository, never()).save(any());
+  }
+
+
 }

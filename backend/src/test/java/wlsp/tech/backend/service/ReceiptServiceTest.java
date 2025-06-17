@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import wlsp.tech.backend.model.receipt.Receipt;
 import wlsp.tech.backend.repository.ReceiptRepository;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,16 @@ class ReceiptServiceTest {
 
   @Test
   void saveReceipt_shouldReturnSavedReceipt() {
-    Receipt receipt = new Receipt("1", "user123", "https://image.jpg", Instant.now());
+    Receipt receipt = new Receipt(
+            "1",
+            "user123",
+            "https://image.jpg",
+            Instant.now(),
+            "REWE",
+            new BigDecimal("5.55"),
+            LocalDate.of(2025, 6, 17),
+            "Food"
+    );
 
     when(receiptRepository.save(receipt)).thenReturn(receipt);
 
@@ -39,8 +50,26 @@ class ReceiptServiceTest {
   @Test
   void getAllReceipts_shouldReturnAllReceipts() {
     List<Receipt> receipts = List.of(
-            new Receipt("1", "user1", "uri1", Instant.now()),
-            new Receipt("2", "user2", "uri2", Instant.now())
+            new Receipt(
+                    "1",
+                    "user123",
+                    "https://image.jpg",
+                    Instant.now(),
+                    "REWE",
+                    new BigDecimal("5.55"),
+                    LocalDate.of(2025, 6, 17),
+                    "Food"
+            ),
+            new Receipt(
+                    "3",
+                    "user1233",
+                    "https://image.jpg3",
+                    Instant.now(),
+                    "REWE",
+                    new BigDecimal("5.55"),
+                    LocalDate.of(2025, 6, 17),
+                    "Food"
+            )
     );
 
     when(receiptRepository.findAll()).thenReturn(receipts);
@@ -57,8 +86,26 @@ class ReceiptServiceTest {
     String userId = "user123";
     List<String> receiptIds = List.of("1", "2");
     List<Receipt> expectedReceipts = List.of(
-            new Receipt("1", userId, "uri1", Instant.now()),
-            new Receipt("2", userId, "uri2", Instant.now())
+            new Receipt(
+                    "1",
+                    "user123",
+                    "https://image.jpg",
+                    Instant.now(),
+                    "REWE",
+                    new BigDecimal("5.55"),
+                    LocalDate.of(2025, 6, 17),
+                    "Food"
+            ),
+            new Receipt(
+                    "3",
+                    "user1233",
+                    "https://image.jpg",
+                    Instant.now(),
+                    "REWE",
+                    new BigDecimal("5.55"),
+                    LocalDate.of(2025, 6, 17),
+                    "Food"
+            )
     );
 
     when(receiptRepository.findByIdInAndUserId(receiptIds, userId)).thenReturn(expectedReceipts);
@@ -97,7 +144,16 @@ class ReceiptServiceTest {
   @Test
   void getReceiptById_shouldReturnReceiptIfExists() {
     String id = "receipt1";
-    Receipt receipt = new Receipt(id, "user123", "https://image.jpg", Instant.now());
+    Receipt receipt = new Receipt(
+            id,
+            "user123",
+            "https://image.jpg",
+            Instant.now(),
+            "REWE",
+            new BigDecimal("5.55"),
+            LocalDate.of(2025, 6, 17),
+            "Food"
+    );
 
     when(receiptRepository.findById(id)).thenReturn(Optional.of(receipt));
 

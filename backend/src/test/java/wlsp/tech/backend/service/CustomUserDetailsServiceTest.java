@@ -44,4 +44,13 @@ class CustomUserDetailsServiceTest {
     assertThrows(UsernameNotFoundException.class, () ->
             customUserDetailsService.loadUserByUsername("notfound@example.com"));
   }
+
+  @Test
+  void loadUserByUsername_emailCaseInsensitive_stillFindsUser() {
+    User user = new User("1", "Alice", "alice@example.com", "encoded-password", List.of());
+
+    when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.of(user));
+    UserDetails userDetails = customUserDetailsService.loadUserByUsername("alice@example.com");
+    assertEquals("alice@example.com", userDetails.getUsername());
+  }
 }

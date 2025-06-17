@@ -10,5 +10,4 @@ public class SpaController {
   public String forwardToClientRouter() {
     return "forward:/index.html";
   }
-
 }
