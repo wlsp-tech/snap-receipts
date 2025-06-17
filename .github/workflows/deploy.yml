@@ -54,8 +54,8 @@ jobs:
       - name: Upload App.jar
         uses: actions/upload-artifact@v4
         with:
-          name: 'receipts-app.jar'
-          path: 'backend/target/receipts-app.jar'
+          name: 'snap-receipts-app.jar'
+          path: 'backend/target/snap-receipts-app.jar'
 
   push-to-docker-hub:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
       - name: Download Backend Artefakt
         uses: actions/download-artifact@v4
         with:
-          name: 'receipts-app.jar'
+          name: 'snap-receipts-app.jar'
           path: backend/target/
 
       - name: Login to Docker Hub
