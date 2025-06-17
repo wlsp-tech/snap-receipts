@@ -6,7 +6,7 @@ import {NavigationProps} from "@/types";
 
 const Navigation = ({ isMounted, currentUser }: NavigationProps) => {
     const filteredItems = navItems.filter(item => {
-        return item.public || !!currentUser
+        return item.public ?? !!currentUser
     })
 
     return (

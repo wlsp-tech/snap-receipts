@@ -23,9 +23,7 @@ const DeleteCell = ({deleteCallback } : DeleteCellProps ) => {
                     Deleting...
                 </>
             ) : (
-                <>
                     <Trash2Icon className="ml-1 w-4 h-4" />
-                </>
             )}
         </Button>
     );

@@ -98,7 +98,7 @@ export default function DocumentSelector({
                     .filter(Boolean)
                     .slice(0, 20);
 
-                const dateMatch = /(?:\b(?:Datum|Date)\b\s*[:-]?\s*)?(\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b|\b\d{4}[./-]\d{1,2}[./-]\d{1,2}\b)/i.exec(text);
+                const dateMatch = /(?:\b(?:Datum|Date)\b\s*[:-]?\s*)?(\d{1,4}[./-]\d{1,2}[./-]\d{1,4})/i.exec(text);
                 const rawDate = dateMatch?.[1] ?? "";
 
                 const amountMatch = /(total|gesamt|gesamtbetrag|summe|amount|betrag)\D{0,10}(\d+[.,]\d{2})/i.exec(text);
@@ -118,7 +118,7 @@ export default function DocumentSelector({
                     });
 
                 const result: OCRResult = {
-                    date: normalizedDate || "",
+                    date: normalizedDate ?? "",
                     amount: amountMatch?.[2] ?? "",
                     company:
                         lines.find(
@@ -127,16 +127,7 @@ export default function DocumentSelector({
                                 !/rechn|invoice|summe|datum|date/i.test(l) &&
                                 l.length > 3
                         ) ?? "",
-                    category:
-                        lines.find((l) =>
-                            /\b(essen|food|restaurant|lebensmittel|transport|fahrt|reise|verkehr|büro|office)/i.test(l)
-                        )?.toLowerCase().includes("essen") || lines.find((l) => /food|restaurant|lebensmittel/i.test(l))
-                            ? "food"
-                            : lines.find((l) => /transport|fahrt|reise|verkehr/i.test(l))
-                                ? "transport"
-                                : lines.find((l) => /büro|office/i.test(l))
-                                    ? "office"
-                                    : "",
+                    category: "",
                 };
 
                 setOcrResult(result);
