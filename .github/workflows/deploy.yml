@@ -51,11 +51,11 @@ jobs:
       - name: Build Backend mit Maven
         run: mvn -B package --file backend/pom.xml
 
-      - name: Upload App.jar
+      - name: Upload SnapReceipt.jar
         uses: actions/upload-artifact@v4
         with:
-          name: 'snap-receipts-app.jar'
-          path: 'backend/target/snap-receipts-app.jar'
+          name: 'snap-receipts-jar'
+          path: 'backend/target/snap-receipts.jar'
 
   push-to-docker-hub:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
       - name: Download Backend Artefakt
         uses: actions/download-artifact@v4
         with:
-          name: 'snap-receipts-app.jar'
+          name: snap-receipts      # so hast du das Artefakt beim Build benannt
           path: backend/target/
 
       - name: Login to Docker Hub
@@ -79,8 +79,8 @@ jobs:
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          push: true
+          context: .                           # verweist auf dein Dockerfile
+          push: true                          # damit das Image hochgeladen wird
           tags: ${{ secrets.DOCKER_IMAGE_TAG }}
 
   deploy-to-render:
