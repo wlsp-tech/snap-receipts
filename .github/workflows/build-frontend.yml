@@ -1,4 +1,4 @@
-name: Build Frontend
+name: SonarQube-Frontend
 on:
   push:
     branches:
@@ -17,3 +17,6 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          with:
+            args: >
+              -Dsonar.projectKey=wlsp-tech_snap-receipts_frontend

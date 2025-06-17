@@ -67,7 +67,7 @@ jobs:
       - name: Download Backend Artefakt
         uses: actions/download-artifact@v4
         with:
-          name: app.jar
+          name: 'receipts-app.jar'
           path: backend/target/
 
       - name: Login to Docker Hub
