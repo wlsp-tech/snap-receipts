@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Tesseract from "tesseract.js";
 import { DocumentSelectorProps, OCRResult } from "@/types";
 import { toast } from "sonner";
@@ -31,23 +31,17 @@ export default function DocumentSelector({
      handleUploadCallback,
      formValues,
      setFormValues,
+    setOcrResult,
+    fileInputRef,
+    loading,
+    setLoading,
  }: Readonly<DocumentSelectorProps>) {
-    const [loading, setLoading] = useState(false);
-    const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [fieldErrors, setFieldErrors] = useState({
         company: "",
         date: "",
         amount: "",
         category:""
     });
-
-    const triggerFileSelect = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-            fileInputRef.current.click();
-        }
-    };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -139,7 +133,7 @@ export default function DocumentSelector({
                 setLoading(false);
             }
         })();
-    }, [fileUri, setReadyToUploadFile, setFormValues]);
+    }, [fileUri, setReadyToUploadFile, setFormValues, setOcrResult, setLoading]);
 
     const handleCancelInternal = () => {
         if (fileUri) URL.revokeObjectURL(fileUri);
@@ -151,7 +145,7 @@ export default function DocumentSelector({
     };
 
     return (
-        <LayoutContainer className="flex flex-col items-center gap-4 w-full">
+        <LayoutContainer className="flex flex-col items-center gap-4 w-full lg:max-w-6/12 xl:max-w-4/12">
             <input
                 ref={fileInputRef}
                 type="file"
@@ -160,13 +154,7 @@ export default function DocumentSelector({
                 onChange={handleFileChange}
             />
 
-            {!ocrResult && !loading && (
-                <Button className="mt-6" onClick={triggerFileSelect} disabled={loading}>
-                    Select a receipt
-                </Button>
-            )}
-
-            <div className="flex-1 mx-auto mt-4 space-y-2">
+            <div className="w-full mx-auto space-y-2">
                 <Label htmlFor="company">Company</Label>
                 {loading ? (
                     <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
@@ -267,10 +255,7 @@ export default function DocumentSelector({
                     </>
                 )}
 
-                <div className="flex gap-2 pt-4">
-                    <Button variant="outline" onClick={triggerFileSelect} disabled={loading || !fileUri || !readyToUploadFile}>
-                        Choose another file
-                    </Button>
+                <div className="flex justify-center gap-2 pt-4">
                     <Button onClick={handleCheckBeforeUpload} disabled={!readyToUploadFile || loading || !fileUri}>
                         Upload
                     </Button>

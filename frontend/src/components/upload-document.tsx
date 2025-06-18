@@ -1,21 +1,37 @@
-import { useEffect, useState } from "react";
-import { uploadReceipt } from "@/features/receipt/service/receipt-service";
-import { StatusType, UploadDocumentProps, OCRResult } from "@/types";
+import {useEffect, useRef, useState} from "react";
+import {uploadReceipt} from "@/features/receipt/service/receipt-service";
+import {OCRResult, StatusType, UploadDocumentProps} from "@/types";
 import {toast} from "sonner";
 import {useNavigate} from "@tanstack/react-router";
-import {DocumentSelector, ImageCompressor, LayoutContainer, UploadStatusAnimation} from "@/components";
+import {
+    Button,
+    DocumentSelector,
+    ImageCompressor,
+    LayoutContainer,
+    ScanningFileAnimation,
+    UploadStatusAnimation
+} from "@/components";
+import {cn} from "@/lib/utils";
+
+const statusMessages: Partial<Record<StatusType, string>> = {
+    [StatusType.SUCCESS]: "Document uploaded successfully.",
+    [StatusType.ERROR]: "Upload failed. Please try again.",
+};
 
 export default function UploadDocument({
    token,
    uriFile,
    onUploadSuccess,
    onCancel,
-    tokenPage
+   tokenPage
 }: Readonly<UploadDocumentProps>) {
     const [fileUri, setFileUri] = useState<string | null>(null);
     const [compressedUri, setCompressedUri] = useState<string | null>(null);
     const [readyToUploadFile, setReadyToUploadFile] = useState<boolean>(false);
-    const [status, setStatus] = useState<StatusType>(StatusType.ERROR);
+    const [status, setStatus] = useState<StatusType>(StatusType.IDLE);
+    const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [loading, setLoading] = useState(false);
     const [formValues, setFormValues] = useState<OCRResult>({
         company: "",
         amount: "",
@@ -36,6 +52,13 @@ export default function UploadDocument({
         setReadyToUploadFile(false);
         setStatus(StatusType.IDLE);
         onCancel?.();
+    };
+
+    const triggerFileSelect = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+            fileInputRef.current.click();
+        }
     };
 
     const handleUpload = async () => {
@@ -62,7 +85,6 @@ export default function UploadDocument({
                 normalizedAmount,
                 normalizedDate,
                 formValues.category,
-
             );
 
             setFileUri(null);
@@ -72,8 +94,8 @@ export default function UploadDocument({
 
             setTimeout(() => {
                 onUploadSuccess?.();
-                if(tokenPage && status === StatusType.IDLE) {
-                    navigate({ to: "/dashboard" });
+                if (tokenPage && status === StatusType.IDLE) {
+                    navigate({to: "/dashboard"});
                 }
             }, 3500);
         } catch {
@@ -97,27 +119,48 @@ export default function UploadDocument({
     }, [uriFile]);
 
     return (
-        <LayoutContainer className="flex flex-col md:flex-row w-full mx-auto my-16 lg:my-0 h-full items-center justify-center space-y-4">
-            <div className="w-full lg:max-w-4/12 flex flex-col items-center justify-center relative m-0">
-                <UploadStatusAnimation status={status} />
+        <LayoutContainer
+            className="flex flex-col md:flex-row w-full mx-auto my-16 lg:my-0 h-full items-center justify-center space-y-4">
+            <div
+                className="w-full md:max-w-4/12 lg:max-w-5/12 xl:max-w-4/12 flex flex-col items-center justify-center relative m-0">
+                <UploadStatusAnimation status={status}/>
 
-                {status === StatusType.SUCCESS && (
-                    <p className="animate-in mt-4">
-                        Document uploaded successfully.
-                    </p>
-                )}
-
-                {status === StatusType.ERROR && (
-                    <p className="animate-in mt-4">Upload failed. Please try again.</p>
-                )}
+                <p className="mt-4 text-center relative w-full min-h-[1.5rem]">
+                    <span
+                        className={cn(
+                            "absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out",
+                            statusMessages[status] && "opacity-100"
+                        )}>{statusMessages[status]}
+                    </span>
+                </p>
 
                 {status === StatusType.IDLE && (
-                    <div className="w-[210px] aspect-[210/297]">
-                        <ImageCompressor
-                            uri={fileUri}
-                            setCompressedUri={setCompressedUri}
-                            setReadyToUploadFile={setReadyToUploadFile}
-                        />
+                    <div className="flex flex-col items-center justify-center mb-8">
+                        {loading && (
+                            <div
+                                className="w-[210px] aspect-[210/297] p-4 bg-[#EAEAEA] rounded-md flex items-center justify-center">
+                                <ScanningFileAnimation />
+                            </div>
+                        )}
+                        {!loading && (
+                            <>
+                                <div className="w-[210px] aspect-[210/297]">
+                                    <ImageCompressor
+                                        uri={fileUri}
+                                        setCompressedUri={setCompressedUri}
+                                        setReadyToUploadFile={setReadyToUploadFile}
+                                    />
+                                </div>
+                                <Button
+                                    className="mt-6"
+                                    onClick={triggerFileSelect}
+                                    disabled={loading}
+                                    variant={ocrResult ? "outline" : "default"}
+                                >
+                                    {ocrResult ? "Change file" : "Select file"}
+                                </Button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>
@@ -133,6 +176,10 @@ export default function UploadDocument({
                     handleUploadCallback={handleUpload}
                     formValues={formValues}
                     setFormValues={setFormValues}
+                    setOcrResult={setOcrResult}
+                    fileInputRef={fileInputRef}
+                    loading={loading}
+                    setLoading={setLoading}
                 />
             )}
         </LayoutContainer>

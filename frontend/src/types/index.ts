@@ -1,7 +1,6 @@
-import {PropsWithChildren, ReactNode} from "react";
+import {Dispatch, PropsWithChildren, ReactNode, RefObject, SetStateAction} from "react";
 import {fetchCurrentUser} from "@/features/auth";
 import {ColumnDef} from "@tanstack/react-table";
-import * as React from "react";
 
 
 export type Theme = "dark" | "light" | "system"
@@ -122,14 +121,18 @@ export interface OCRResult {
 
 export interface DocumentSelectorProps {
     fileUri: string | null;
+    formValues: OCRResult;
+    readyToUploadFile: boolean;
+    loading: boolean;
+    onCancel?: () => void;
+    handleUploadCallback: () => void;
     setFileUri: (uri: string | null) => void;
     onSelect: (uri: string, mimeType: string) => void;
-    onCancel?: () => void;
-    readyToUploadFile: boolean;
     setReadyToUploadFile: (ready: boolean) => void;
-    handleUploadCallback: () => void;
-    formValues: OCRResult;
-    setFormValues: React.Dispatch<React.SetStateAction<OCRResult>>;
+    fileInputRef: RefObject<HTMLInputElement | null>
+    setOcrResult: Dispatch<SetStateAction<OCRResult | null>>
+    setFormValues: Dispatch<SetStateAction<OCRResult>>;
+    setLoading: Dispatch<SetStateAction<boolean>>
 }
 
 export type uploadStatusProps = {

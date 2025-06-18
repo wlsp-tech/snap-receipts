@@ -16,7 +16,7 @@ const DeleteCell = ({deleteCallback } : DeleteCellProps ) => {
     };
 
     return (
-        <Button  variant="icon" className="hover:text-destructive" disabled={isDeleting} onClick={handleDelete}>
+        <Button  variant="icon" className="hover:text-destructive p-0" disabled={isDeleting} onClick={handleDelete}>
             {isDeleting ? (
                 <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />

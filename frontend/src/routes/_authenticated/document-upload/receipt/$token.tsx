@@ -4,7 +4,7 @@ import LayoutContainer from "@/components/shared/layout-container";
 import UploadDocument from "@/components/upload-document";
 import {queryClient} from "@/lib/queryClient";
 import {loginWithToken} from "@/features/auth/service/auth-service";
-import UploadStatusAnimation from "@/components/lottie-status.tsx";
+import UploadStatusAnimation from "@/components/upload-status-animation.tsx";
 import {StatusType} from "@/types";
 
 export const Route = createFileRoute(

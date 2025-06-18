@@ -61,9 +61,9 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                                         key={header.id}
                                         colSpan={header.colSpan}
                                         className={cn(
-                                            "p-4 w-[14%]",
-                                            header.id === "receiptImg" && "w-[30%]",
-                                            header.id === "actions" && "text-right"
+                                            "p-3 w-[14%] text-center",
+                                            header.id === "receiptImg" && "text-left w-[30%]",
+                                            header.id === "actions" && "w-[6%] text-right"
                                         )}
                                     >
                                         {header.id !== "actions" && header.column.id !== "receiptImg"  ? (
@@ -115,9 +115,9 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                                         <td
                                             key={cell.id}
                                             className={cn(
-                                                "p-4 w-[14%]",
-                                                cell.column.id === "receiptImg" && "w-[30%]",
-                                                cell.column.id === "actions" && "text-right"
+                                                "p-3 text-center w-[14%]",
+                                                cell.column.id === "receiptImg" && " text-left w-[30%]",
+                                                cell.column.id === "actions" && "w-[6%] text-right"
                                             )}
                                         >
                                             {flexRender(
