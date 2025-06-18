@@ -158,7 +158,7 @@ const Dashboard = () => {
                         <div className=" w-full lg:w-1/2 mx-auto grid grid-cols-[1fr_1fr] gap-10 h-full text-sm">
                             <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4 text-center">
                                 <QRCodeComp token={token} />
-                                <p className="px-8 text-foreground">Snap the receipt with your Smartphone</p>
+                                <p className="px-8">Snap the receipt with your Smartphone</p>
                             </div>
                             <div>
                                 <DropzoneModal

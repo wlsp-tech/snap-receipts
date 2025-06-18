@@ -5,11 +5,10 @@ const QRCodeComp = ({token}: { token?: string }) => {
     return <QRCode
         value={url}
         size={150}
-        eyeRadius={8}
+        eyeRadius={6}
         eyeColor="#625FFF"
-        qrStyle={"fluid"}
-        logoImage={"/scan-text.svg"}
-        removeQrCodeBehindLogo={true}
+        bgColor={"transparent"}
+        logoPadding={200}
         logoPaddingStyle={"circle"}
     />
 };
