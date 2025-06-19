@@ -1,4 +1,5 @@
 name: Snap-Receipts Deployment
+
 on:
   push:
     branches:
@@ -16,8 +17,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build Frontend
+      - name: Build Frontend with ENV
         working-directory: frontend
+        env:
+          VITE_FRONTEND_ORIGIN: ${{ secrets.VITE_FRONTEND_ORIGIN }}
         run: |
           npm install
           npm run build
@@ -39,7 +42,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'temurin'    # oder 'zulu', je nach Bedarf
+          distribution: 'temurin'
           cache: 'maven'
 
       - name: Download Frontend-Build
@@ -54,7 +57,7 @@ jobs:
       - name: Upload SnapReceipt.jar
         uses: actions/upload-artifact@v4
         with:
-          name: 'snap-receipts'                   # Artefaktname OHNE .jar, für Konsistenz
+          name: 'snap-receipts'
           path: 'backend/target/snap-receipts.jar'
 
   push-to-docker-hub:
@@ -66,7 +69,7 @@ jobs:
       - name: Download Backend Artefakt
         uses: actions/download-artifact@v4
         with:
-          name: snap-receipts                     # Name entspricht Upload
+          name: snap-receipts
           path: backend/target/
 
       - name: Login to Docker Hub
@@ -78,7 +81,7 @@ jobs:
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          context: .                             # Dockerfile Pfad
+          context: .
           push: true
           tags: ${{ secrets.DOCKER_IMAGE_TAG }}
 
