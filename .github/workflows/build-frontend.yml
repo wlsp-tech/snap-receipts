@@ -9,6 +9,9 @@ jobs:
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
+    env:
+      VITE_FRONTEND_ORIGIN: ${{ secrets.VITE_FRONTEND_ORIGIN }}
+
     steps:
       - uses: actions/checkout@v4
         with:
