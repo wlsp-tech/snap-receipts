@@ -1,1 +1,0 @@
-import{c as t,j as e,S as o}from"./index-DOsPwNsK.js";import{A as s,F as r}from"./form-wrapper-DvcSE106.js";const m=t("/auth/sign-up")({component:n});function n(){return e.jsx(s,{className:"flex items-center",children:e.jsx(r,{mode:"sign-up",headerLabel:"Come to the Snap side of the Receipts!",children:e.jsx(o,{})})})}export{m as Route};
