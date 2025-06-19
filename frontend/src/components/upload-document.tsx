@@ -1,8 +1,9 @@
 import {useEffect, useRef, useState} from "react";
-import {uploadReceipt} from "@/features/receipt/service/receipt-service";
-import {OCRResult, StatusType, UploadDocumentProps} from "@/types";
 import {toast} from "sonner";
 import {useNavigate} from "@tanstack/react-router";
+import {useQuery} from '@tanstack/react-query';
+import {getReceipts, uploadReceipt} from "@/features/receipt/service/receipt-service";
+import {OCRResult, ReceiptProps, StatusType, UploadDocumentProps} from "@/types";
 import {
     Button,
     DocumentSelector,
@@ -39,6 +40,12 @@ export default function UploadDocument({
         category: ""
     });
     const navigate = useNavigate();
+
+    const {refetch: refetchReceipts} = useQuery<ReceiptProps[]>({
+        queryKey: ['receipts'],
+        queryFn: getReceipts,
+        staleTime: 1000 * 60 * 30,
+    });
 
     const handleSelect = (uri: string) => {
         setFileUri(uri);
@@ -91,6 +98,7 @@ export default function UploadDocument({
             setCompressedUri(null);
             setReadyToUploadFile(false);
             setStatus(StatusType.SUCCESS);
+            refetchReceipts();
 
             setTimeout(() => {
                 onUploadSuccess?.();

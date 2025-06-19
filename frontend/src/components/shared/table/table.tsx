@@ -61,7 +61,7 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                                         key={header.id}
                                         colSpan={header.colSpan}
                                         className={cn(
-                                            "p-3 w-[14%] text-center",
+                                            "sticky top-0 p-3 w-[14%] text-center",
                                             header.id === "receiptImg" && "text-left w-[30%]",
                                             header.id === "actions" && "w-[6%] text-right"
                                         )}

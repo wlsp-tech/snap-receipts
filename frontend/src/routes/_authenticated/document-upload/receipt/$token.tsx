@@ -1,11 +1,9 @@
 import {useEffect, useState} from "react";
 import {createFileRoute, useParams} from '@tanstack/react-router';
-import LayoutContainer from "@/components/shared/layout-container";
-import UploadDocument from "@/components/upload-document";
 import {queryClient} from "@/lib/queryClient";
 import {loginWithToken} from "@/features/auth/service/auth-service";
-import UploadStatusAnimation from "@/components/upload-status-animation.tsx";
 import {StatusType} from "@/types";
+import {LayoutContainer, UploadDocument, UploadStatusAnimation} from "@/components";
 
 export const Route = createFileRoute(
     '/_authenticated/document-upload/receipt/$token'
@@ -46,7 +44,10 @@ function RouteComponent() {
 
     return (
         <LayoutContainer className="flex flex-1 justify-items-center items-center gap-2 flex-col">
-            {token && isLoggedIn && !loading && !error && <UploadDocument tokenPage={true} token={token} />}
+            {token && isLoggedIn && !loading && !error && <UploadDocument
+                tokenPage={true}
+                token={token} />
+            }
             {loading && <UploadStatusAnimation status={StatusType.LOADING} />}
             {error && <p>Error: {error}</p>}
             {!isLoggedIn && <p>You are not logged in.</p>}
