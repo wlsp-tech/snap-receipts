@@ -8,8 +8,11 @@ const QRCodeComp = ({token}: { token?: string }) => {
         eyeRadius={6}
         eyeColor="#625FFF"
         bgColor={"transparent"}
+        logoImage={"/scan-text.svg"}
         logoPadding={200}
         logoPaddingStyle={"circle"}
+        removeQrCodeBehindLogo={true}
+        qrStyle={"dots"}
     />
 };
 export default QRCodeComp;
