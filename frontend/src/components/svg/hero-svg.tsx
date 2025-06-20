@@ -118,7 +118,7 @@ function HeroSvg(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
                             fill="#9fe6fd" className="circle-dot"></circle>
                     <text data-v-89efd6b1="" x="843.5050048828125" y="340.2239990234375" fill="#a3a3a3"
                           fontFamily="Inter, sans-serif" fontSize="11px" fontStyle="normal" fontWeight="400"
-                          textAnchor="middle" alignmentBaseline="hanging" className="label">receipt
+                          textAnchor="middle" alignmentBaseline="hanging" className="label">fast
                     </text>
                     <defs data-v-89efd6b1="">
                         <mask id="glow_mask_0.4q7ggupxlbf" data-v-89efd6b1="">
