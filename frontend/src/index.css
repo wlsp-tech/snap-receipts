@@ -69,3 +69,186 @@ li {
   width: 100%;
   position: relative;
 }
+
+.snap-receipt[data-v-5ae9923b] {
+  overflow: hidden;
+  transition: all .6s ease-out;
+  transform: translateZ(0) scale(.85)
+}
+
+.snap-receipt .snap-receipt__filter[data-v-5ae9923b] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateZ(0) scale(1);
+  transition: transform .3s ease-in-out;
+  background: linear-gradient(130deg,#3d3d3d4d,#3d3d3d00 40%),linear-gradient(130deg,#2a213f00 60%,#3d3d3d4d),linear-gradient(to bottom,#100e1a4d 60%,#0c0c0c00);
+  border-radius: 10px;
+  display: block
+}
+
+.snap-receipt .snap-receipt__filter[data-v-5ae9923b]:after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  background: linear-gradient(130deg,#3d3d3d00 45%,#9a98de4d 50%,#3d3d3d00 60%);
+  background-size: 500%;
+  background-position-x: 100%;
+  filter: blur(8px);
+  border-radius: 100px;
+  mix-blend-mode: color-dodge;
+  display: block
+}
+
+.snap-receipt .snap-receipt__filter[data-v-5ae9923b]:before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  background: linear-gradient(-130deg,#2a213f00 40%,#9a98de33,#2a213f00 60%);
+  background-size: 400%;
+  background-position-x: 100%;
+  filter: blur(10px);
+  border-radius: 100px;
+  mix-blend-mode: color-dodge;
+  display: block
+}
+
+.snap-receipt .snap-receipt__edge[data-v-5ae9923b] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(to bottom right,rgba(0,0,0,0) 60%,rgba(255,255,255,.15) 65%,rgba(0,0,0,0) 90%);
+  opacity: 0;
+  will-change: opacity,border;
+  transition: all 1s ease-in-out
+}
+
+@media (min-width: 768px) {
+  .snap-receipt .snap-receipt__edge[data-v-5ae9923b] {
+    border-image-source:linear-gradient(to bottom right,rgba(0,0,0,0) 50%,rgba(255,255,255,.15) 60%,rgba(0,0,0,0) 90%)
+  }
+}
+
+.snap-receipt .snap-receipt__border[data-v-5ae9923b] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 10px;
+  border: 0 solid rgba(89,82,108,.3);
+  opacity: .8;
+  background: #2828284d
+}
+
+@media (min-width: 768px) {
+  .snap-receipt .snap-receipt__border[data-v-5ae9923b] {
+    top:2px;
+    right: 2px;
+    left: 2px;
+    bottom: 2px
+  }
+}
+
+.snap-receipt .snap-receipt__logo[data-v-5ae9923b] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(.9);
+  opacity: .2;
+  filter: grayscale(100%);
+  transition: all .2s ease;
+  z-index: 3
+}
+
+.snap-receipt .uwu.snap-receipt__logo[data-v-5ae9923b] {
+  width: 134px
+}
+
+.snap-receipt.active[data-v-5ae9923b] {
+  box-shadow: 0 30px 35px -10px #0009;
+  transform: translateZ(0) scale(1)
+}
+
+.snap-receipt.active .snap-receipt__edge[data-v-5ae9923b] {
+  opacity: 1
+}
+
+@media (min-width: 768px) {
+  .snap-receipt.active .snap-receipt__edge.edge--animated[data-v-5ae9923b] {
+    animation:rotateGradient-5ae9923b 8s linear infinite
+  }
+}
+
+.snap-receipt.active .snap-receipt__filter[data-v-5ae9923b] {
+  transform: translateZ(0) scale(.97)
+}
+
+.snap-receipt.active .snap-receipt__filter[data-v-5ae9923b]:before {
+  animation: shimmer-5ae9923b 8s infinite linear
+}
+
+.snap-receipt.active .snap-receipt__filter[data-v-5ae9923b]:after {
+  animation: shimmer-5ae9923b 6s infinite linear
+}
+
+.snap-receipt.active .snap-receipt__border[data-v-5ae9923b] {
+  border-width: 5px;
+  transition: all 1s ease
+}
+
+.snap-receipt.active .snap-receipt__logo[data-v-5ae9923b] {
+  opacity: 1;
+  filter: grayscale(0);
+  transform: translate(-50%,-50%) scale(1)
+}
+
+@keyframes shimmer-5ae9923b {
+  to {
+    background-position-x: 0
+  }
+}
+
+.landing {
+  text-align: center;
+  font-family: Manrope,sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  background: linear-gradient(180deg,#fff,#ffffff4f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-wrap: balance;
+  cursor: default;
+  font-size: 44px;
+  line-height: 120%;
+  letter-spacing: -.88px;
+  padding: 0 20px;
+  margin-bottom: 15px
+}
+
+.dropzone-container {
+  height: 0;
+  transition: height .3s;
+  overflow: hidden;
+
+  &.active {
+    height: 250px;
+    max-height: 250px;
+  }
+}
+

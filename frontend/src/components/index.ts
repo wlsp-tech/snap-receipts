@@ -9,6 +9,7 @@ export {default as LayoutContainer } from "./shared/layout-container"
 export { ThemeToggle } from "./shared/theme-toggle"
 
 export { default as CloudUploadIcon } from "./svg/cloud-upload-icon"
+export { default as HeroSvg } from "./svg/hero-svg"
 
 export { Button } from "./ui/button"
 export { Card } from "./ui/card"

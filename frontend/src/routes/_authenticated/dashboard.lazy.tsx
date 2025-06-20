@@ -7,17 +7,19 @@ import {useQuery} from '@tanstack/react-query';
 import {ColumnDef} from "@tanstack/react-table";
 import {queryClient} from "@/lib/queryClient";
 import {Button, DropzoneModal, Image, LayoutContainer, Table, DeleteCell, QRCodeComp} from "@/components";
-import {dateFormater} from "@/lib/utils";
+import {cn, dateFormater} from "@/lib/utils";
 
 const Dashboard = () => {
     const [token, setToken] = useState<string>();
     const navigate = useNavigate();
     const isMobile = window.matchMedia('(max-width: 1279px)').matches;
+    const [isActive, setIsActive] = useState<boolean>(false);
 
     const handleNewReceipt = async () => {
         try {
             const newToken = await fetchUploadToken();
             setToken(newToken);
+            setIsActive(true)
 
             if (isMobile) {
                 await navigate({
@@ -154,8 +156,8 @@ const Dashboard = () => {
                     </>
                 )}
 
-                {token && !isMobile && (
-                    <div className="flex w-full mb-18">
+                <div className={cn("flex w-full mb-12 dropzone-container", isActive && "active")}>
+                    {token && !isMobile && (
                         <div className=" w-full lg:w-1/2 mx-auto grid grid-cols-[1fr_1fr] gap-10 h-full text-sm">
                             <div
                                 className="flex flex-col items-center justify-center bg-white rounded-lg p-4 text-center">
@@ -166,13 +168,16 @@ const Dashboard = () => {
                                 <DropzoneModal
                                     token={token}
                                     onUploadSuccess={
-                                        () => setToken(undefined)
+                                        () => {
+                                            setToken(undefined);
+                                            setIsActive(prev => !prev)
+                                        }
                                     }
                                 />
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
                 {!isError && data && data.length > 0 && (
                     <Table
