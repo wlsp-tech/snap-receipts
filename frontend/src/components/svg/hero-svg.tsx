@@ -9,7 +9,7 @@ function HeroSvg(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 844 644"
             fill="none"
-            className="h-full"
+            className="input-lines h-full"
         >
             <g>
                 <path

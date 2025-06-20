@@ -192,15 +192,16 @@ function Root() {
     return (
         <LayoutContainer className="p-4">
             <h1 className="landing">Welcome to the Snap side<br/> of the Receipts!</h1>
-            <div className="hero__diagram h-96 lg:h-[680px]" id="hero-diagram" data-v-5ae9923b="">
+            <h3 className="max-w-xl mx-auto text-center text-[#a9a9a9]">Blazing fast receipt digitization, organizes and merges receipts – turning paper chaos into digital clarity in seconds.</h3>
+            <div className="hero__diagram w-[760px] h-[580px] lg:h-[680px]" id="hero-diagram" data-v-5ae9923b="">
                 <HeroSvg/>
-                <div className="snap-receipt active absolute w-18 h-18 top-[392px] left-76 lg:w-36 lg:h-36 lg:top-[408px] lg:left-[815px] rounded-[10px] aspect-square" data-v-5ae9923b="">
+                <div className="snap-receipt active absolute w-36 h-36 top-[60%] lg:top-[52%] left-84 lg:left-1/2 rounded-[10px] aspect-square transform" data-v-5ae9923b="">
                     <div className="snap-receipt__background" data-v-5ae9923b="">
                         <div className="snap-receipt__border" data-v-5ae9923b=""></div>
                         <div className="snap-receipt__edge edge--animated" data-v-5ae9923b=""></div>
                     </div>
                     <div className="snap-receipt__filter" data-v-5ae9923b=""></div>
-                    <img src="/scan-text.svg" alt="Snap Receipts Logo" className="snap-receipt__logo w-10 lg:w-18"
+                    <img src="/scan-text.svg" alt="Snap Receipts Logo" className="snap-receipt__logo w-18"
                          data-v-5ae9923b=""/></div>
             </div>
         </LayoutContainer>
