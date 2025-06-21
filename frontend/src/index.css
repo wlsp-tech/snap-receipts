@@ -238,7 +238,15 @@ li {
   line-height: 120%;
   letter-spacing: -.88px;
   padding: 0 20px;
-  margin-bottom: 15px
+  margin-bottom: 15px;
+
+  & span {
+    background: linear-gradient(180deg,#ffffff4f, #7471f1);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
 }
 
 .dropzone-container {
