@@ -191,7 +191,7 @@ function Root() {
 
     return (
         <LayoutContainer className="p-4">
-            <h1 className="landing max-w-xl mx-auto">Welcome to the Snap side of the <span className="text-indigo-500">Receipts!</span>
+            <h1 className="landing max-w-3xl mx-auto">Welcome to the Snap side of the <span className="text-indigo-500">Receipts!</span>
             </h1>
             <h3 className="max-w-xl mx-auto text-center text-[#a9a9a9]">Blazing fast receipt digitization, organizes and merges receipts – turning paper chaos into digital clarity in seconds.</h3>
             <div className="hero__diagram w-[760px] h-[580px] lg:h-[680px]" id="hero-diagram" data-v-5ae9923b="">
