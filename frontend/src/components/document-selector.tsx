@@ -145,7 +145,7 @@ export default function DocumentSelector({
     };
 
     return (
-        <LayoutContainer className="flex flex-col items-center gap-4 w-full lg:max-w-6/12 xl:max-w-4/12">
+        <LayoutContainer className="flex flex-col items-center justify-center gap-4 w-full lg:max-w-6/12 xl:max-w-4/12">
             <input
                 ref={fileInputRef}
                 type="file"
@@ -154,108 +154,110 @@ export default function DocumentSelector({
                 onChange={handleFileChange}
             />
 
-            <div className="w-full mx-auto space-y-2">
-                <Label htmlFor="company">Company</Label>
-                {loading ? (
-                    <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
-                ) : (
-                    <>
-                        <Input
-                            id="company"
-                            value={formValues.company}
-                            placeholder="Company"
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setFormValues((prev) => ({ ...prev, company: value }));
-                                if (value.trim()) {
-                                    setFieldErrors((prev) => ({ ...prev, company: "" }));
-                                }
-                            }}
-                        />
-                        {fieldErrors.company && (
-                            <p className="text-sm text-red-500 mt-1">{fieldErrors.company}</p>
-                        )}
-                    </>
-                )}
+            <div className="w-full h-full mx-auto space-y-2 flex flex-col">
+                <div className="h-full flex flex-col space-y-2 mb-4">
+                    <Label htmlFor="company">Company</Label>
+                    {loading ? (
+                        <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
+                    ) : (
+                        <>
+                            <Input
+                                id="company"
+                                value={formValues.company}
+                                placeholder="Company"
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setFormValues((prev) => ({ ...prev, company: value }));
+                                    if (value.trim()) {
+                                        setFieldErrors((prev) => ({ ...prev, company: "" }));
+                                    }
+                                }}
+                            />
+                            {fieldErrors.company && (
+                                <p className="text-sm text-red-500 mt-1">{fieldErrors.company}</p>
+                            )}
+                        </>
+                    )}
 
-                <Label htmlFor="date">Date</Label>
-                {loading ? (
-                    <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
-                ) : (
-                    <>
-                        <Input
-                            id="date"
-                            value={formValues.date}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setFormValues((prev) => ({ ...prev, date: value }));
-                                if (value.trim()) {
-                                    setFieldErrors((prev) => ({ ...prev, date: "" }));
-                                }
-                            }}
-                            placeholder="DD.MM.YYYY"
-                        />
-                        {fieldErrors.date && (
-                            <p className="text-sm text-red-500 mt-1">{fieldErrors.date}</p>
-                        )}
-                    </>
-                )}
+                    <Label htmlFor="date">Date</Label>
+                    {loading ? (
+                        <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
+                    ) : (
+                        <>
+                            <Input
+                                id="date"
+                                value={formValues.date}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setFormValues((prev) => ({ ...prev, date: value }));
+                                    if (value.trim()) {
+                                        setFieldErrors((prev) => ({ ...prev, date: "" }));
+                                    }
+                                }}
+                                placeholder="DD.MM.YYYY"
+                            />
+                            {fieldErrors.date && (
+                                <p className="text-sm text-red-500 mt-1">{fieldErrors.date}</p>
+                            )}
+                        </>
+                    )}
 
-                <Label htmlFor="amount">Amount</Label>
-                {loading ? (
-                    <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
-                ) : (
-                    <>
-                        <Input
-                            id="amount"
-                            value={formValues.amount}
-                            placeholder="Total"
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setFormValues((prev) => ({ ...prev, amount: value }));
-                                if (value.trim()) {
-                                    setFieldErrors((prev) => ({ ...prev, amount: "" }));
-                                }
-                            }}
-                        />
-                        {fieldErrors.amount && (
-                            <p className="text-sm text-red-500 mt-1">{fieldErrors.amount}</p>
-                        )}
-                    </>
-                )}
+                    <Label htmlFor="amount">Amount</Label>
+                    {loading ? (
+                        <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
+                    ) : (
+                        <>
+                            <Input
+                                id="amount"
+                                value={formValues.amount}
+                                placeholder="Total"
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setFormValues((prev) => ({ ...prev, amount: value }));
+                                    if (value.trim()) {
+                                        setFieldErrors((prev) => ({ ...prev, amount: "" }));
+                                    }
+                                }}
+                            />
+                            {fieldErrors.amount && (
+                                <p className="text-sm text-red-500 mt-1">{fieldErrors.amount}</p>
+                            )}
+                        </>
+                    )}
 
-                <Label htmlFor="category">Category</Label>
-                {loading ? (
-                    <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
-                ) : (
-                    <>
-                        <Select
-                            value={formValues.category}
-                            onValueChange={(value) => {
-                                setFormValues((prev) => ({ ...prev, category: value }));
-                                if (value.trim()) {
-                                    setFieldErrors((prev) => ({ ...prev, category: "" }));
-                                }
-                            }}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {categories.map((c) => (
-                                    <SelectItem key={c.value} value={c.value}>
-                                        {c.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {fieldErrors.category && (
-                            <p className="text-sm text-red-500 mt-1">{fieldErrors.category}</p>
-                        )}
-                    </>
-                )}
+                    <Label htmlFor="category">Category</Label>
+                    {loading ? (
+                        <Skeleton className="h-10 w-full rounded-md bg-gray-200" />
+                    ) : (
+                        <>
+                            <Select
+                                value={formValues.category}
+                                onValueChange={(value) => {
+                                    setFormValues((prev) => ({ ...prev, category: value }));
+                                    if (value.trim()) {
+                                        setFieldErrors((prev) => ({ ...prev, category: "" }));
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map((c) => (
+                                        <SelectItem key={c.value} value={c.value}>
+                                            {c.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {fieldErrors.category && (
+                                <p className="text-sm text-red-500 mt-1">{fieldErrors.category}</p>
+                            )}
+                        </>
+                    )}
+                </div>
 
-                <div className="flex justify-center gap-2 pt-4">
+                <div className="flex justify-center gap-2 mt-auto">
                     <Button onClick={handleCheckBeforeUpload} disabled={!readyToUploadFile || loading || !fileUri}>
                         Upload
                     </Button>

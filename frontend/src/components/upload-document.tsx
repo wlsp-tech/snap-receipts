@@ -133,17 +133,19 @@ export default function UploadDocument({
                 className="w-full md:max-w-4/12 lg:max-w-5/12 xl:max-w-4/12 flex flex-col items-center justify-center relative m-0">
                 <UploadStatusAnimation status={status}/>
 
-                <p className="mt-4 text-center relative w-full min-h-[1.5rem]">
+                {statusMessages[status] && (
+                    <p className="mt-4 text-center relative w-full min-h-[1.5rem]">
                     <span
                         className={cn(
                             "absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out",
                             statusMessages[status] && "opacity-100"
                         )}>{statusMessages[status]}
                     </span>
-                </p>
+                    </p>
+                )}
 
                 {status === StatusType.IDLE && (
-                    <div className="flex flex-col items-center justify-center mb-8">
+                    <div className="flex flex-col items-center justify-center mb-8 md:mb-0">
                         {loading && (
                             <div
                                 className="w-[210px] aspect-[210/297] p-4 bg-[#EAEAEA] rounded-md flex items-center justify-center">

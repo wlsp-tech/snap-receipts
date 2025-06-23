@@ -6,7 +6,7 @@ import {toast} from "sonner";
 import {useQuery} from '@tanstack/react-query';
 import {ColumnDef} from "@tanstack/react-table";
 import {queryClient} from "@/lib/queryClient";
-import {Button, DropzoneModal, Image, LayoutContainer, Table, DeleteCell, QRCodeComp} from "@/components";
+import {Button, DropzoneModal, LayoutContainer, Table, DeleteCell, QRCodeComp, FilePreview} from "@/components";
 import {cn, dateFormater} from "@/lib/utils";
 
 const Dashboard = () => {
@@ -58,7 +58,7 @@ const Dashboard = () => {
                     return (
                         <div className="grid grid-cols-[auto_1fr] items-center gap-2">
                             <div className="w-24">
-                                <Image src={imageUri} alt={`Receipt-${id}`}/>
+                                <FilePreview uri={imageUri} alt={`Receipt-${id}`}/>
                             </div>
                             <div className="p-2">
                                 <p>
