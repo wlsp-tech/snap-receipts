@@ -3,21 +3,25 @@ import {HeroSvg, LayoutContainer} from "@/components";
 import {useEffect} from 'react';
 import gsap from 'gsap';
 import {MotionPathPlugin} from 'gsap/MotionPathPlugin';
+import {useTheme} from "@/hooks";
+import {cn} from "@/lib/utils.ts";
 
 function Root() {
+    const {theme} = useTheme();
+    console.log(theme)
     gsap.registerPlugin(MotionPathPlugin);
 
     useEffect(() => {
         const paths = gsap.utils.toArray<SVGPathElement>(".svg-path");
-        const colors = ['#6766cb', '#ab88e8', '#615fff', '#5d5d70', '#ffffff', '#615fff', '#615fff'];
+        const colors = ['#6766cb', '#ab88e8', '#615fff', '#99d9c7', '#ffffff', '#615fff', '#615fff'];
 
         // Zufällige Reihenfolge der Punkte
         const shuffledIndices = gsap.utils.shuffle(Array.from(Array(paths.length).keys()));
 
         // Gruppen zu je 3 Punkten bilden
         const groups: number[][] = [];
-        for (let i = 0; i < shuffledIndices.length; i += 3) {
-            groups.push(shuffledIndices.slice(i, i + 3));
+        for (let i = 1; i < shuffledIndices.length; i += 3 - 1) {
+            groups.push(shuffledIndices.slice(i, i + 3 + 1));
         }
 
         // Master Timeline für den Loop
@@ -35,10 +39,10 @@ function Root() {
                 const label = parent.querySelector(".label") as SVGTextElement;
 
                 // SPEED: Animationsdauer (3 Sekunden)
-                const animationDuration = 4.5;
+                const animationDuration = 3;
 
                 // Zufälliges Delay innerhalb der Gruppe
-                const delay = gsap.utils.random(0.2, 0.6);
+                const delay = gsap.utils.random(0.2, 0.9);
 
                 // CIRCLE: Farbe für Punkt zuweisen
                 const color = colors[index % colors.length];
@@ -73,7 +77,7 @@ function Root() {
                 maskCircle = document.querySelector(`#${maskId} .glow-mask-circle`) as SVGCircleElement;
 
                 // GLOW: Maximale Größe des Leuchteffekts
-                const maxGlowRadius = 35;
+                const maxGlowRadius = 55;
 
                 // Startzustand: unsichtbar
                 gsap.set(circle, {
@@ -91,7 +95,7 @@ function Root() {
                     progress: 0, // RICHTUNG: Von 1 nach 0 = rückwärts entlang des Pfads
                     duration: animationDuration,
                     delay,
-                    ease: "power1.inOut",
+                    ease: "power2.inOut",
                     onUpdate: () => {
                         const progress = animationState.progress;
                         const pathLength = path.getTotalLength();
@@ -106,7 +110,7 @@ function Root() {
 
                         // Erste 5%: Wachsen von 0 auf 3 (jetzt am ENDE des Pfads)
                         if (progress >= 0.95) {
-                            const factor = (1 - progress) / 0.05;
+                            const factor = (1 - progress) / 0.5;
                             circleRadius = 3 * factor;
                             glowRadius = maxGlowRadius * factor;
                             opacity = factor;
@@ -139,7 +143,7 @@ function Root() {
                             gsap.set(label, {
                                 attr: {
                                     x: point.x,
-                                    y: point.y + 8
+                                    y: point.y + 6
                                 },
                                 opacity: opacity
                             });
@@ -191,9 +195,9 @@ function Root() {
 
     return (
         <LayoutContainer className="p-4">
-            <h1 className="landing max-w-3xl mx-auto">Welcome to the Snap side of the <span className="text-indigo-500">Receipts!</span>
+            <h1 className={cn("landing max-w-3xl mx-auto", theme !== "dark" && "light")}>Welcome to the Snap side of the <span className="text-indigo-500">Receipts!</span>
             </h1>
-            <h3 className="max-w-xl mx-auto text-center text-[#a9a9a9]">Blazing fast receipt digitization, organizes and merges receipts – turning paper chaos into digital clarity in seconds.</h3>
+            <h3 className="max-w-xl mx-auto text-center  text-[#424141] dark:text-[#a9a9a9]">Blazing fast receipt digitization, organizes and merges receipts – turning paper chaos into digital clarity in seconds.</h3>
             <div className="hero__diagram w-[760px] h-[580px] lg:h-[680px]" id="hero-diagram" data-v-5ae9923b="">
                 <HeroSvg/>
                 <div className="snap-receipt active absolute w-36 h-36 top-[60%] md:top-[52%] lg:top-[52.5%] left-84 md:left-[81%] lg:left-1/2 rounded-[10px] aspect-square transform" data-v-5ae9923b="">

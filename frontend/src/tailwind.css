@@ -144,10 +144,6 @@
     }
 }
 
-@theme {
-    --color-element: var(--color-gray-100);
-}
-
 @layer components {
     .max-w-screen-custom {
         max-width: var(--max-width-custom);
