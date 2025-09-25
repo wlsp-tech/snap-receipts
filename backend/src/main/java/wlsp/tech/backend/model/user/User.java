@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -18,13 +19,15 @@ public class User {
   private String email;
   private String password;
   private List<String> receiptIds;
+  private Date createdAt;
 
-  public User(String id, String nameOfUser, String email, String password, List<String> receiptIds) {
+  public User(String id, String nameOfUser, String email, String password, List<String> receiptIds, Date createdAt) {
     this.id = id;
     this.nameOfUser = nameOfUser;
     this.email = email;
     this.password = password;
     this.receiptIds = receiptIds;
+    this.createdAt = createdAt;
   }
 
   public void addReceiptId(String receiptId) {

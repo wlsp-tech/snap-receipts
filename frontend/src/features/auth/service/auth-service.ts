@@ -1,4 +1,4 @@
-import api from "@/api/axios";
+import api from "@/lib/api/axios";
 import { LoginPayload, UserDto } from "@/types";
 import { queryClient } from "@/lib/queryClient";
 

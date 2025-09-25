@@ -2,9 +2,8 @@ import {useState} from 'react';
 import {LogOut} from "lucide-react";
 import {cn} from "@/lib/utils.ts";
 import {UserAvatarProps} from "@/types";
-import {Button} from "@/components/ui/button.tsx";
+import {Button} from "@/components/ui/common/button.tsx";
 import {UserAvatar} from "@/features/user";
-
 
 const UserAvatarAction = ({nameOfUser, onLogout, btnClassName}: UserAvatarProps) => {
     const [open, setOpen] = useState<boolean>(false);

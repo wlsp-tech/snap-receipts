@@ -1,4 +1,4 @@
-import api from "@/api/axios.ts";
+import api from "@/lib/api/axios.ts";
 import {ReceiptProps} from "@/types";
 import axios from "axios";
 import {toast} from "sonner";

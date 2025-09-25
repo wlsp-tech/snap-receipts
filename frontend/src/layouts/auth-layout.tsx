@@ -10,4 +10,4 @@ const AuthLayout = ({className, children} : {className?: string, children: React
     )
 }
 
-export default AuthLayout;
+export default AuthLayout

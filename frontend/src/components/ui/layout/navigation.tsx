@@ -1,6 +1,6 @@
 import {NavigationMenu, NavigationMenuItem, NavigationMenuLink} from "@radix-ui/react-navigation-menu";
 import {Link} from "@tanstack/react-router";
-import {navItems} from "@nav/items";
+import {navItems} from "@nav/items.ts";
 import {cn} from "@/lib/utils.ts";
 import {NavigationProps} from "@/types";
 

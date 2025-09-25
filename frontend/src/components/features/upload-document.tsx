@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 import {useNavigate} from "@tanstack/react-router";
 import {useQuery} from '@tanstack/react-query';
-import {getReceipts, uploadReceipt} from "@/features/receipt/service/receipt-service";
+import {getReceipts, uploadReceipt} from "@/features/receipt/service/receipt-service.ts";
 import {OCRResult, ReceiptProps, StatusType, UploadDocumentProps} from "@/types";
 import {
     Button,
@@ -12,7 +12,7 @@ import {
     ScanningFileAnimation,
     UploadStatusAnimation
 } from "@/components";
-import {cn} from "@/lib/utils";
+import {cn} from "@/lib/utils.ts";
 
 const statusMessages: Partial<Record<StatusType, string>> = {
     [StatusType.SUCCESS]: "Document uploaded successfully.",

@@ -9,7 +9,7 @@ import {
     PaginationState,
     useReactTable,
 } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/common/button.tsx";
 import {cn} from "@/lib/utils";
 import {
     ArrowDown,
@@ -50,8 +50,8 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
 
     return (
         <div className="w-full text-foreground">
-            <div className="overflow-x-auto sm:overflow-visible">
-                <div className="min-w-4xl w-fit mx-auto">
+            <div className="overflow-x-auto lg:overflow-visible">
+                <div className="w-full min-w-xl">
                     <table className="w-full table-fixed">
                         <thead className="text-left [&_tr]:border-b">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -63,7 +63,7 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                                         className={cn(
                                             "sticky top-0 p-3 w-[14%] text-center",
                                             header.id === "receiptImg" && "text-left w-[30%]",
-                                            header.id === "actions" && "w-[6%] text-right"
+                                            header.id === "actions" && "text-right"
                                         )}
                                     >
                                         {header.id !== "actions" && header.column.id !== "receiptImg"  ? (
@@ -131,12 +131,11 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                         )}
                         </tbody>
                     </table>
-
                 </div>
             </div>
 
-            <div className="w-full mt-6 flex flex-col gap-4 sm:flex-row sm:items-center px-2">
-                <div className="sticky left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-2 w-fit">
+            <div className="w-full mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center px-2">
+                <div className="flex gap-2 w-full justify-center">
                     <Button
                         variant="icon"
                         onClick={() => table.firstPage()}
@@ -167,7 +166,7 @@ function TableGen<T>({ data, columns, isLoading }: Readonly<TableGenProps<T>>) {
                     </Button>
                 </div>
 
-                <div className="flex flex-col items-center sm:items-end self-end gap-1">
+                <div className="flex flex-col items-center sm:items-end justify-center lg:self-end gap-1">
                     <p className="text-sm">
                         Page{' '}
                         <strong>{table.getState().pagination.pageIndex + 1}</strong> of{' '}

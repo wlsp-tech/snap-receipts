@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "react";
 import lottie, {AnimationItem} from "lottie-web";
-import animationData from "../assets/lottie/upload-status.json";
+import animationData from "../../assets/lottie/upload-status.json";
 import {StatusType, uploadStatusProps} from "@/types";
 
 export default function UploadStatusAnimation({ status }: Readonly<uploadStatusProps>) {

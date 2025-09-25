@@ -1,5 +1,5 @@
-import {Card, CardHeader, CardContent} from "@/components/ui/card"
-import {Button} from "@/components/ui/button"
+import {Card, CardHeader, CardContent} from "@/components/ui/common/card.tsx"
+import {Button} from "@/components/ui/common/button.tsx"
 import {Link} from "@tanstack/react-router"
 import {FormWrapperProps} from "@/types";
 import {cn} from "@/lib/utils.ts";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { LucideLogIn } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils.ts"
 import { useAuth } from "@/features/auth/hooks"
 import { UserAvatarAction } from "@/features/user"
 import {Navigation, ThemeToggle} from "@/components";

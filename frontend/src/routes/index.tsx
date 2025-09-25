@@ -8,7 +8,7 @@ import {cn} from "@/lib/utils.ts";
 
 function Root() {
     const {theme} = useTheme();
-    console.log(theme)
+
     gsap.registerPlugin(MotionPathPlugin);
 
     useEffect(() => {

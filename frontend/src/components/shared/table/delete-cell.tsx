@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/common/button.tsx";
 import { Trash2Icon, Loader2 } from "lucide-react";
 import {DeleteCellProps} from "@/types";
 

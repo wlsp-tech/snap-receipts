@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Image } from "@/components/index.ts"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/common/dialog.tsx"
+import { Image } from "@/components"
 
 interface FilePreviewProps {
     uri?: string | null

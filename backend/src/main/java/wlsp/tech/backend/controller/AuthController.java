@@ -14,6 +14,7 @@ import wlsp.tech.backend.service.IdService;
 import wlsp.tech.backend.service.SessionService;
 import wlsp.tech.backend.service.UploadTokenService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,11 +45,12 @@ public class AuthController {
             request.nameOfUser(),
             request.email(),
             passwordEncoder.encode(request.password()),
-            List.of()
+            List.of(),
+            request.createdAt()
     );
     userRepository.save(user);
 
-    UserDto userDto = new UserDto(idService.generateId(), user.getNameOfUser(), user.getEmail(), user.getReceiptIds());
+    UserDto userDto = new UserDto(idService.generateId(), user.getNameOfUser(), user.getEmail(), user.getReceiptIds(), new Date());
     return ResponseEntity.ok(userDto);
   }
 
@@ -67,7 +69,8 @@ public class AuthController {
             user.getId(),
             user.getNameOfUser(),
             user.getEmail(),
-            user.getReceiptIds()
+            user.getReceiptIds(),
+            user.getCreatedAt()
     );
     return ResponseEntity.ok(userDto);
   }
@@ -80,7 +83,8 @@ public class AuthController {
                       user.getId(),
                       user.getNameOfUser(),
                       user.getEmail(),
-                      user.getReceiptIds()
+                      user.getReceiptIds(),
+                      user.getCreatedAt()
               );
               return ResponseEntity.ok(userDto);
             })
@@ -123,7 +127,8 @@ public class AuthController {
             user.getId(),
             user.getNameOfUser(),
             user.getEmail(),
-            user.getReceiptIds()
+            user.getReceiptIds(),
+            user.getCreatedAt()
     );
 
     return ResponseEntity.ok(userDto);

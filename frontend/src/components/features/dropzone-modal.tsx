@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useState, ChangeEvent} from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils.ts";
 import {CloudUploadIcon, Dialog, DialogDescription, DialogTitle, DialogHeader, DialogContent, UploadDocument} from "@/components";
 
 export default function DropzoneModal({

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useMemo } from "react";
 import { AuthContext } from "@/context/auth-context";
 import { loginUser, logoutUser, fetchCurrentUser } from "@/features/auth";
 import { queryClient } from "@/lib/queryClient";
@@ -8,9 +8,9 @@ import { UserDto } from "@/types";
 export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     const [user, setUser] = useState<UserDto | null>(null);
     const [loading, setLoading] = useState(true);
-    const pathNames = ["/", "/auth/login", "/auth/sign-up"];
 
     useEffect(() => {
+        const pathNames = ["/", "/auth/login", "/auth/sign-up"];
 
         if (pathNames.includes(location.pathname)) { return }
 
@@ -28,30 +28,39 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
     const login = async (email: string, password: string) => {
         try {
-            const loggedInUser = await loginUser({ email, password });
+            const loggedInUser = await loginUser({ email, password })
             setUser(loggedInUser);
-            toast.success(`Welcome back, ${loggedInUser.nameOfUser}`);
+            toast.success(`Welcome back, ${loggedInUser.nameOfUser}`)
         } catch (error) {
-            toast.error("Login failed");
-            throw error;
+            toast.error("Login failed")
+            throw error
         }
     };
 
     const logout = async () => {
         try {
-            await logoutUser();
-            setUser(null);
-            queryClient.removeQueries({ queryKey: ['currentUser'] });
-            toast.info("You'll be back!");
+            await logoutUser()
+            setUser(null)
+            queryClient.removeQueries({ queryKey: ['currentUser'] })
+            toast.info("You'll be back!")
         } catch (error) {
             if(error instanceof Error) {
-                toast.error(`Logout failed! Error: ${error.message}`);
+                toast.error(`Logout failed! Error: ${error.message}`)
             }
         }
     };
 
+    const authContextValue = useMemo(() => ({
+        user,
+        isAuthenticated: !!user,
+        loading,
+        setUser,
+        login,
+        logout
+    }), [user, loading]);
+
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, setUser, login, logout }}>
+        <AuthContext.Provider value={authContextValue}>
             {children}
         </AuthContext.Provider>
     );

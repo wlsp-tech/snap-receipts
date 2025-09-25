@@ -156,8 +156,8 @@ const Dashboard = () => {
                     </>
                 )}
 
-                <div className={cn("flex w-full mb-12 dropzone-container", isActive && "active")}>
-                    {token && !isMobile && (
+                {token && !isMobile && (
+                    <div className={cn("flex w-full mb-12 dropzone-container", isActive && "active")}>
                         <div className=" w-full lg:w-1/2 mx-auto grid grid-cols-[1fr_1fr] gap-10 h-full text-sm">
                             <div
                                 className="flex flex-col items-center justify-center bg-white rounded-lg p-4 text-center">
@@ -176,8 +176,8 @@ const Dashboard = () => {
                                 />
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {!isError && data && data.length > 0 && (
                     <Table

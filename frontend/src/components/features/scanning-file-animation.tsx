@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "react";
 import lottie, {AnimationItem} from "lottie-web";
-import animationData from "../assets/lottie/file-scanning.json";
+import animationData from "../../assets/lottie/file-scanning.json";
 import {cn} from "@/lib/utils.ts";
 
 export default function ScanningFileAnimation({ className }: Readonly<{className?: string}>) {

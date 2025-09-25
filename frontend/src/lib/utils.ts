@@ -11,25 +11,26 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /*
-* Return current Year
-* */
+ * Return current Year
+ */
 export const FullYear = () => new Date().getFullYear();
 
 /*
-* Formats date in german styles
-* */
+ * Formats date in German styles
+ */
 export function dateFormater(date: string) {
   const formatedDate = new Date(date);
   return new Intl.DateTimeFormat("de-DE", {
     year: "numeric",
     month: "short",
     day: "2-digit",
-  }).format(formatedDate);
+  }).format(formatedDate)
 }
 
+
 /*
-* Helper function to create grid-cols/layout base on cols
-* */
+ * Helper function to create grid-cols/layout base on cols
+ */
 const colClassesMap: Record<number, string> = {
   1: "grid-cols-1",
   2: "grid-cols-2",
@@ -45,12 +46,12 @@ const colClassesMap: Record<number, string> = {
   12: "grid-cols-12",
 };
 export const buildGridCols = (gridCols?: GridLayoutProps["gridCols"]) => {
-  if (!gridCols) return "grid-cols-1";
+  if (!gridCols) return "grid-cols-1"
 
   return Object.entries(gridCols)
       .map(([breakpoint, cols]) => {
         const colClass = colClassesMap[cols ?? 1] || "grid-cols-1";
-        return breakpoint === "base" ? colClass : `${breakpoint}:${colClass}`;
+        return breakpoint === "base" ? colClass : `${breakpoint}:${colClass}`
       })
-      .join(" ");
+      .join(" ")
 };
