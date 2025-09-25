@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ class SessionServiceTest {
   @Test
   void getLoggedInUser_whenUserIdInSession_returnsUser() {
     String userId = "user-123";
-    User mockUser = new User(userId, "Alice", "alice@example.com", "hashed", List.of());
+    User mockUser = new User(userId, "Alice", "alice@example.com", "hashed", List.of(), new Date());
 
     when(session.getAttribute("userId")).thenReturn(userId);
     when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));

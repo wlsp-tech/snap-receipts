@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.List;
 
@@ -26,7 +27,7 @@ class CustomUserDetailsServiceTest {
 
   @Test
   void loadUserByUsername_withExistingUser_returnsUserDetails() {
-    User user = new User("1", "Alice", "alice@example.com", "encoded-password", List.of());
+    User user = new User("1", "Alice", "alice@example.com", "encoded-password", List.of(), new Date());
 
     when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.of(user));
 
@@ -47,7 +48,7 @@ class CustomUserDetailsServiceTest {
 
   @Test
   void loadUserByUsername_emailCaseInsensitive_stillFindsUser() {
-    User user = new User("1", "Alice", "alice@example.com", "encoded-password", List.of());
+    User user = new User("1", "Alice", "alice@example.com", "encoded-password", List.of(), new Date());
 
     when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.of(user));
     UserDetails userDetails = customUserDetailsService.loadUserByUsername("alice@example.com");

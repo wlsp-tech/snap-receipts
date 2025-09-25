@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -217,7 +218,7 @@ class ReceiptControllerTest {
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(
-                            new RegisterRequest(name, email, "securepassword"))))
+                            new RegisterRequest(name, email, "securepassword", new Date()))))
             .andExpect(status().isOk());
   }
 

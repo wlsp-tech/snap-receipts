@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import wlsp.tech.backend.model.dto.LoginRequest;
 import wlsp.tech.backend.model.dto.RegisterRequest;
 
+import java.util.Date;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,7 +30,7 @@ class AuthControllerTest {
 
   @Test
   void signUp_withValidData_returnsUserDto() throws Exception {
-    RegisterRequest req = new RegisterRequest("John Doe", "john@example.com", "password123");
+    RegisterRequest req = new RegisterRequest("John Doe", "john@example.com", "password123", new Date());
     String json = objectMapper.writeValueAsString(req);
 
     mockMvc.perform(post("/api/auth/sign-up")
@@ -42,7 +44,7 @@ class AuthControllerTest {
 
   @Test
   void signUp_withEmptyName_returnsBadRequest() throws Exception {
-    RegisterRequest req = new RegisterRequest("", "emptyname@example.com", "pwd");
+    RegisterRequest req = new RegisterRequest("", "emptyname@example.com", "pwd", new Date());
     String json = objectMapper.writeValueAsString(req);
 
     mockMvc.perform(post("/api/auth/sign-up")
@@ -53,13 +55,13 @@ class AuthControllerTest {
 
   @Test
   void signUp_withExistingEmail_returnsConflict() throws Exception {
-    RegisterRequest req = new RegisterRequest("Alice", "alice@example.com", "pwd");
+    RegisterRequest req = new RegisterRequest("Alice", "alice@example.com", "pwd", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(req)))
             .andExpect(status().isOk());
 
-    RegisterRequest req2 = new RegisterRequest("Alice2", "alice@example.com", "pwd2");
+    RegisterRequest req2 = new RegisterRequest("Alice2", "alice@example.com", "pwd2", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(req2)))
@@ -68,7 +70,7 @@ class AuthControllerTest {
 
   @Test
   void login_withValidCredentials_returnsUserDtoAndSession() throws Exception {
-    RegisterRequest reg = new RegisterRequest("Bob", "bob@example.com", "secret");
+    RegisterRequest reg = new RegisterRequest("Bob", "bob@example.com", "secret", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reg)))
@@ -87,7 +89,7 @@ class AuthControllerTest {
 
   @Test
   void login_withWrongPassword_returnsUnauthorized() throws Exception {
-    RegisterRequest reg = new RegisterRequest("Carol", "carol@example.com", "rightpwd");
+    RegisterRequest reg = new RegisterRequest("Carol", "carol@example.com", "rightpwd", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reg)))
@@ -103,7 +105,7 @@ class AuthControllerTest {
 
   @Test
   void getCurrentUser_withSession_returnsUserDto() throws Exception {
-    RegisterRequest reg = new RegisterRequest("David", "david@example.com", "mypwd");
+    RegisterRequest reg = new RegisterRequest("David", "david@example.com", "mypwd", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reg)))
@@ -133,7 +135,7 @@ class AuthControllerTest {
 
   @Test
   void logout_withSession_returnsOk() throws Exception {
-    RegisterRequest reg = new RegisterRequest("Eva", "eva@example.com", "pwd");
+    RegisterRequest reg = new RegisterRequest("Eva", "eva@example.com", "pwd", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(reg)))
@@ -155,7 +157,7 @@ class AuthControllerTest {
 
   @Test
   void tokenLogin_withValidToken_returnsUserDtoAndSession() throws Exception {
-    RegisterRequest register = new RegisterRequest("Frank", "frank@example.com", "pw123");
+    RegisterRequest register = new RegisterRequest("Frank", "frank@example.com", "pw123", new Date());
     mockMvc.perform(post("/api/auth/sign-up")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(register)))

@@ -6,6 +6,7 @@ import wlsp.tech.backend.model.user.User;
 import wlsp.tech.backend.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,8 @@ class UserServiceTest {
             "Alice",
             "alice@example.com",
             "hashedPassword",
-            new ArrayList<>(List.of("oldReceiptId"))
+            new ArrayList<>(List.of("oldReceiptId")),
+            new Date()
     );
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
@@ -73,7 +75,8 @@ class UserServiceTest {
             "Alice",
             "alice@example.com",
             "hashedPassword",
-            new ArrayList<>(List.of("receipt123", "receipt456", "receipt789"))
+            new ArrayList<>(List.of("receipt123", "receipt456", "receipt789")),
+            new Date()
     );
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
